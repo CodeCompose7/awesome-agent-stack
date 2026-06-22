@@ -16,7 +16,10 @@ function remarkMermaid() {
     if (!node.children) return;
     node.children.forEach((/** @type {any} */ child, /** @type {number} */ i) => {
       if (child.type === 'code' && child.lang === 'mermaid') {
-        node.children[i] = { type: 'html', value: `<pre class="mermaid">${esc(child.value)}</pre>` };
+        node.children[i] = {
+          type: 'html',
+          value: `<div class="aas-diagram"><pre class="mermaid">${esc(child.value)}</pre></div>`,
+        };
       } else {
         walk(child);
       }

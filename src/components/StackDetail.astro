@@ -12,6 +12,7 @@ import CodeSamples from './CodeSamples.astro';
 import MermaidLoader from './MermaidLoader.astro';
 import Toc from './Toc.astro';
 import { getRepoStats } from '../lib/github';
+import { renderSamples } from '../lib/samples';
 
 interface Props {
   entry: StackEntry;
@@ -41,6 +42,7 @@ const links = [
 ].filter(Boolean) as { label: string; href: string }[];
 
 const hasSamples = data.samples.length > 0;
+const renderedSamples = hasSamples ? await renderSamples(data.samples) : [];
 ---
 
 <a href={getRelativeLocaleUrl(lang, '')} class="text-sm text-[var(--aas-accent)] no-underline"
@@ -99,7 +101,7 @@ const hasSamples = data.samples.length > 0;
             <Content />
           </article>
           <div slot="code">
-            <CodeSamples samples={data.samples} lang={lang} />
+            <CodeSamples samples={renderedSamples} lang={lang} />
           </div>
         </DetailTabs>
       ) : (
@@ -118,25 +120,13 @@ const hasSamples = data.samples.length > 0;
       </div>
       {
         hasSamples && (
-          <nav data-toc="code" class="hidden text-sm" aria-label={t('toc.versions')}>
-            <p class="mb-2 text-xs font-semibold tracking-wide text-[var(--aas-muted)] uppercase">
-              {t('toc.versions')}
-            </p>
-            <ul class="border-l border-[var(--aas-border)]">
-              {data.samples.map((s, i) => (
-                <li>
-                  <button
-                    type="button"
-                    data-toc-version={i}
-                    aria-current={i === 0 ? 'true' : 'false'}
-                    class="-ml-px block w-full border-l-2 border-transparent py-1 pl-3 text-left text-[var(--aas-muted)] hover:border-[var(--aas-accent)] hover:text-[var(--aas-text)] aria-[current=true]:border-[var(--aas-accent)] aria-[current=true]:text-[var(--aas-text)]"
-                  >
-                    {s.version}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <div data-toc="code" class="hidden">
+            {renderedSamples.map((s, i) => (
+              <div data-sample-toc={i} class:list={[i === 0 ? '' : 'hidden']}>
+                <Toc items={s.headings} title={t('toc.onThisPage')} />
+              </div>
+            ))}
+          </div>
         )
       }
     </div>
@@ -146,8 +136,7 @@ const hasSamples = data.samples.length > 0;
 {hasSamples && <MermaidLoader />}
 
 <script>
-  // Sync the right-rail TOC with the active tab, and let the version list drive
-  // the code-sample selector.
+  // Swap the right-rail TOC with the active tab.
   document.addEventListener('aas:tabchange', (e) => {
     const id = (e as CustomEvent<{ id: string }>).detail.id;
     document
@@ -155,22 +144,12 @@ const hasSamples = data.samples.length > 0;
       .forEach((el) => el.classList.toggle('hidden', el.dataset.toc !== id));
   });
 
+  // On the Code tab, show the selected version's internal headings.
   const select = document.querySelector<HTMLSelectElement>('[data-sample-select]');
-  const versionBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-toc-version]'));
-  const markActive = (i: string) =>
-    versionBtns.forEach((b) => b.setAttribute('aria-current', String(b.dataset.tocVersion === i)));
-
-  versionBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      if (select) {
-        select.value = btn.dataset.tocVersion ?? '0';
-        select.dispatchEvent(new Event('change'));
-      }
-      markActive(btn.dataset.tocVersion ?? '0');
-    });
+  const tocBlocks = Array.from(document.querySelectorAll<HTMLElement>('[data-sample-toc]'));
+  select?.addEventListener('change', () => {
+    tocBlocks.forEach((b) => b.classList.toggle('hidden', b.dataset.sampleToc !== select.value));
   });
-  // Keep the version list in sync when the <select> is used directly.
-  select?.addEventListener('change', () => markActive(select.value));
 </script>
 
 {

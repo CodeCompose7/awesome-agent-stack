@@ -88,15 +88,19 @@ body {
   margin: 1rem 0;
 }
 
-/* Mermaid diagram container (overview body + code samples). Follows the theme
-   and clips the rendered SVG to rounded corners. */
-.mermaid {
+/* Mermaid diagram container. The styled wrapper is a div we own, so the
+   border/radius survive Mermaid replacing the inner <pre> with an <svg>. */
+.aas-diagram {
   margin: 1rem 0;
   padding: 1rem;
   background: var(--aas-panel);
   border: 1px solid var(--aas-border);
   border-radius: 0.6rem;
   overflow: hidden;
+}
+.aas-diagram .mermaid {
+  margin: 0;
+  background: transparent;
   text-align: center;
   line-height: 0; /* avoid extra space from the raw source before render */
 }

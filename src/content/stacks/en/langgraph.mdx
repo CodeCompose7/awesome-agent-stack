@@ -40,10 +40,13 @@ samples:
       app = graph.compile()
       print(app.invoke({"input": "hello", "steps": 0}))
     description: |
+      ### When to use
       The **graph API** is explicit: you declare nodes and the edges between
-      them, including a `conditional edge` that loops back until a stop
-      condition. Reach for it when you need branching, retries, or checkpointed
-      state across many steps.
+      them. Reach for it when you need branching, retries, or checkpointed state.
+
+      ### How it flows
+      A `conditional edge` loops back to `think` until the stop condition, then
+      routes to `END`.
   - version: "0.2 · Functional API"
     lang: python
     diagram: |
@@ -66,9 +69,13 @@ samples:
 
       print(app.invoke(0))
     description: |
+      ### When to use
       The **functional API** wraps plain functions with `@task` and an
-      `@entrypoint`. Control flow is just Python — the `for` loop here — so it
-      reads naturally when you don't need an explicit graph.
+      `@entrypoint`. Use it when you don't need an explicit graph.
+
+      ### How it flows
+      Control flow is just Python — the `for` loop calls `think` three times,
+      then returns.
 ---
 
 ## Overview
