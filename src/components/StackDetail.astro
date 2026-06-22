@@ -137,12 +137,19 @@ const renderedSamples = hasSamples ? await renderSamples(data.samples) : [];
 
 <script>
   // Swap the right-rail TOC with the active tab.
-  document.addEventListener('aas:tabchange', (e) => {
-    const id = (e as CustomEvent<{ id: string }>).detail.id;
+  const syncToc = (id: string) =>
     document
       .querySelectorAll<HTMLElement>('[data-toc]')
       .forEach((el) => el.classList.toggle('hidden', el.dataset.toc !== id));
-  });
+
+  document.addEventListener('aas:tabchange', (e) =>
+    syncToc((e as CustomEvent<{ id: string }>).detail.id),
+  );
+
+  // Initial sync from the already-applied tab state (the tab may have been set
+  // from the URL hash before this listener was attached).
+  const active = document.querySelector<HTMLElement>('[data-tab][aria-selected="true"]');
+  if (active?.dataset.tab) syncToc(active.dataset.tab);
 
   // On the Code tab, show the selected version's internal headings.
   const select = document.querySelector<HTMLSelectElement>('[data-sample-select]');

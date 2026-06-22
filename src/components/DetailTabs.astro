@@ -38,14 +38,37 @@ const tabClass =
   document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
     const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab]'));
     const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-panel]'));
-    tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        const id = tab.dataset.tab;
-        tabs.forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
-        panels.forEach((p) => p.classList.toggle('hidden', p.dataset.panel !== id));
-        document.dispatchEvent(new CustomEvent('aas:tabchange', { detail: { id } }));
-        (window as unknown as { __aasRenderMermaid?: () => void }).__aasRenderMermaid?.();
-      });
-    });
+
+    function show(id: string, updateHash: boolean) {
+      tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+      panels.forEach((p) => p.classList.toggle('hidden', p.dataset.panel !== id));
+      document.dispatchEvent(new CustomEvent('aas:tabchange', { detail: { id } }));
+      (window as unknown as { __aasRenderMermaid?: () => void }).__aasRenderMermaid?.();
+      // replaceState updates the URL without scrolling or stacking history.
+      if (updateHash) history.replaceState(null, '', '#' + id);
+    }
+
+    tabs.forEach((tab) => tab.addEventListener('click', () => show(tab.dataset.tab!, true)));
+
+    // Restore the tab from the URL hash so refresh and direct links keep it.
+    // `#code` selects the Code tab; a hash that matches an id inside the code
+    // panel (e.g. a sample heading) does too. Everything else stays on Overview.
+    const raw = decodeURIComponent(location.hash.slice(1));
+    let initial = 'overview';
+    if (raw === 'code') {
+      initial = 'code';
+    } else if (raw && raw !== 'overview') {
+      const codePanel = root.querySelector('[data-panel="code"]');
+      const esc = window.CSS && CSS.escape ? CSS.escape(raw) : raw;
+      try {
+        if (codePanel && codePanel.querySelector('#' + esc)) initial = 'code';
+      } catch {
+        /* invalid selector — ignore */
+      }
+    }
+    if (initial === 'code') {
+      show('code', false);
+      if (raw && raw !== 'code') document.getElementById(raw)?.scrollIntoView();
+    }
   });
 </script>
