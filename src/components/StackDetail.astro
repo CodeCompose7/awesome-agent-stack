@@ -116,20 +116,23 @@ const renderedSamples = hasSamples ? await renderSamples(data.samples) : [];
 {/* Fixed right-rail TOC: follows scroll, swaps with the active tab, and hides
     near the footer. */}
 <aside class="aas-toc-rail" data-toc-rail>
-  <div data-toc="overview">
-    <Toc items={tocItems} title={t('toc.onThisPage')} />
+  <div class="aas-toc-scroll">
+    <div data-toc="overview">
+      <Toc items={tocItems} title={t('toc.onThisPage')} />
+    </div>
+    {
+      hasSamples && (
+        <div data-toc="code" class="hidden">
+          {renderedSamples.map((s, i) => (
+            <div data-sample-toc={i} class:list={[i === 0 ? '' : 'hidden']}>
+              <Toc items={s.headings} title={t('toc.onThisPage')} />
+            </div>
+          ))}
+        </div>
+      )
+    }
   </div>
-  {
-    hasSamples && (
-      <div data-toc="code" class="hidden">
-        {renderedSamples.map((s, i) => (
-          <div data-sample-toc={i} class:list={[i === 0 ? '' : 'hidden']}>
-            <Toc items={s.headings} title={t('toc.onThisPage')} />
-          </div>
-        ))}
-      </div>
-    )
-  }
+  <button type="button" class="aas-toc-top" data-back-to-top>↑ {t('top.label')}</button>
 </aside>
 
 {hasSamples && <MermaidLoader />}
@@ -177,13 +180,10 @@ const renderedSamples = hasSamples ? await renderSamples(data.samples) : [];
   window.addEventListener('scroll', spy, { passive: true });
   spy();
 
-  // Hide the rail once the footer scrolls into view.
-  const footer = document.querySelector('footer');
-  if (rail && footer) {
-    new IntersectionObserver(([entry]) =>
-      rail.setAttribute('data-hidden', String(entry.isIntersecting)),
-    ).observe(footer);
-  }
+  // Back-to-top, pinned at the bottom of the rail.
+  rail
+    ?.querySelector('[data-back-to-top]')
+    ?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 </script>
 
 {

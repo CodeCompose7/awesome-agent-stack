@@ -42,65 +42,46 @@ html {
 }
 
 /* Fixed right-rail TOC: out of the content flow, parked in the right margin.
-   Only shown on wide screens where it won't overlap the centered content. */
+   Only shown on wide screens where it won't overlap the centered content. A
+   flex column so a long TOC scrolls internally while the back-to-top button
+   stays pinned at the bottom. */
 .aas-toc-rail {
   display: none;
 }
 @media (min-width: 1536px) {
   .aas-toc-rail {
-    display: block;
+    display: flex;
+    flex-direction: column;
     position: fixed;
     top: 7rem;
     right: max(1.5rem, calc((100vw - 64rem) / 2 - 15rem));
     width: 13rem;
     max-height: calc(100vh - 9rem);
-    overflow-y: auto;
-    transition:
-      opacity 0.2s,
-      visibility 0.2s;
   }
-  /* Hidden when the footer scrolls into view (handled in StackDetail). */
-  .aas-toc-rail[data-hidden='true'] {
-    opacity: 0;
-    visibility: hidden;
-  }
+}
+.aas-toc-scroll {
+  min-height: 0; /* allow this flex child to shrink so it can scroll */
+  overflow-y: auto;
 }
 .aas-toc-rail a[aria-current='true'] {
   color: var(--aas-text);
   border-color: var(--aas-accent);
 }
 
-/* Back-to-top button. */
-.aas-top {
-  position: fixed;
-  right: 1.5rem;
-  bottom: 1.5rem;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 9999px;
-  border: 1px solid var(--aas-border);
-  background: var(--aas-panel);
-  color: var(--aas-text);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(0.5rem);
-  transition:
-    opacity 0.2s,
-    visibility 0.2s,
-    transform 0.2s,
-    border-color 0.2s;
+/* "Back to top" pinned at the bottom of the TOC rail. */
+.aas-toc-top {
+  flex-shrink: 0;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--aas-border);
+  text-align: left;
+  font-size: 0.8rem;
+  color: var(--aas-muted);
+  background: none;
+  cursor: pointer;
+  transition: color 0.15s;
 }
-.aas-top[data-visible='true'] {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-.aas-top:hover {
-  border-color: var(--aas-accent);
+.aas-toc-top:hover {
   color: var(--aas-accent);
 }
 
