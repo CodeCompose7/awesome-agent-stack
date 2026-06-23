@@ -187,6 +187,26 @@ summary {
   cursor: pointer;
 }
 
+/* Make the `hidden` attribute win over display:flex/grid (used by the homepage
+   search/filter to hide cards and sections). */
+[hidden] {
+  display: none !important;
+}
+
+/* Generic <details> dropdown used by the homepage filter/sort controls. */
+.aas-dd {
+  position: relative;
+}
+.aas-dd > summary {
+  list-style: none;
+}
+.aas-dd > summary::-webkit-details-marker {
+  display: none;
+}
+.aas-dd [data-sort][aria-current='true'] [data-check] {
+  opacity: 1;
+}
+
 /* Readable defaults for rendered Markdown bodies. */
 .prose :where(h2) {
   font-size: 1.5rem;

@@ -29,6 +29,13 @@ const href = getRelativeLocaleUrl(lang, `stacks/${slug}/`);
 // Live stats from GitHub (build-time), with the manual `version` as fallback.
 const stats = await getRepoStats(repo);
 const displayVersion = stats?.version ?? version;
+
+// Data for client-side search / filter / sort (used on the homepage).
+const langTokens = (language ?? '')
+  .split('/')
+  .map((s) => s.trim())
+  .filter(Boolean);
+const searchText = `${name} ${description} ${tags.join(' ')}`.toLowerCase();
 ---
 
 {/* The card is a container, not a link: the name is the stretched primary link
@@ -36,6 +43,14 @@ const displayVersion = stats?.version ?? version;
    they remain individually clickable. */}
 <div
   class="aas-lift relative flex gap-3 rounded-xl border border-[var(--aas-border)] bg-[var(--aas-panel)] p-5"
+  data-tool
+  data-name={name}
+  data-search={searchText}
+  data-pricing={pricing.join('|')}
+  data-license={license ?? ''}
+  data-langs={langTokens.join('|')}
+  data-stars={typeof stats?.stars === 'number' ? String(stats.stars) : ''}
+  data-date={stats?.releasedAt?.slice(0, 10) ?? ''}
 >
   {/* Left column: the content. Grows; chips on the right don't push it down. */}
   <div class="flex min-w-0 flex-1 flex-col">
