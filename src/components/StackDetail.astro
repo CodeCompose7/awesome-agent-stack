@@ -80,6 +80,7 @@ const renderedSamples = hasSamples ? await renderSamples(data.samples) : [];
     license={data.license}
     stars={stats?.stars}
     version={displayVersion}
+    released={stats?.releasedAt?.slice(0, 10)}
     class="mt-5"
   />
 

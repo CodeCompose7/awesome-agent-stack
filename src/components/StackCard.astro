@@ -47,6 +47,7 @@ const displayVersion = stats?.version ?? version;
     license={license}
     stars={stats?.stars}
     version={displayVersion}
+    released={stats?.releasedAt?.slice(0, 10)}
     class="mt-3"
   />
 

@@ -55,6 +55,9 @@ a.aas-anchor {
     opacity 0.15s,
     color 0.15s;
 }
+a.aas-anchor::before {
+  content: '#';
+}
 :where(h2, h3):hover > a.aas-anchor,
 a.aas-anchor:hover,
 a.aas-anchor:focus {

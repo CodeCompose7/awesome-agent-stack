@@ -19,6 +19,8 @@ function rehypeHeadingAnchors() {
         child.properties &&
         child.properties.id
       ) {
+        // Empty anchor — the visible "#" is drawn via CSS ::before so it does
+        // not leak into Astro's extracted heading text (used by the TOC).
         child.children.unshift({
           type: 'element',
           tagName: 'a',
@@ -27,7 +29,7 @@ function rehypeHeadingAnchors() {
             href: '#' + child.properties.id,
             'aria-label': 'Copy link to section',
           },
-          children: [{ type: 'text', value: '#' }],
+          children: [],
         });
       } else {
         walk(child);

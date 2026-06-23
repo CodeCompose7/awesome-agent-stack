@@ -12,6 +12,7 @@
 export interface RepoStats {
   stars: number;
   version?: string;
+  releasedAt?: string; // ISO date of the latest release (YYYY-MM-DD usable via slice)
 }
 
 const cache = new Map<string, Promise<RepoStats | null>>();
@@ -48,19 +49,22 @@ async function fetchStats(owner: string, repo: string): Promise<RepoStats | null
     const stars = typeof data.stargazers_count === 'number' ? data.stargazers_count : 0;
 
     let version: string | undefined;
+    let releasedAt: string | undefined;
     const rel = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases/latest`, {
       headers: headers(),
     });
     if (rel.ok) {
-      version = normalizeVersion((await rel.json()).tag_name);
+      const data = await rel.json();
+      version = normalizeVersion(data.tag_name);
+      releasedAt = data.published_at; // e.g. "2026-05-12T09:00:00Z"
     } else {
-      // No releases — fall back to the most recent tag.
+      // No releases — fall back to the most recent tag (no date available).
       const tags = await fetch(`https://api.github.com/repos/${owner}/${repo}/tags?per_page=1`, {
         headers: headers(),
       });
       if (tags.ok) version = normalizeVersion((await tags.json())[0]?.name);
     }
-    return { stars, version };
+    return { stars, version, releasedAt };
   } catch {
     return null;
   }

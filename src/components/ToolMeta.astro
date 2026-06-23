@@ -1,5 +1,5 @@
 ---
-import { pricingLabels, type Lang } from '../i18n/ui';
+import { pricingLabels, useTranslations, type Lang } from '../i18n/ui';
 import { formatStars } from '../lib/github';
 
 interface Props {
@@ -8,11 +8,14 @@ interface Props {
   license?: string;
   stars?: number | null;
   version?: string | null;
+  released?: string | null; // YYYY-MM-DD of the latest release
   class?: string;
 }
 
-const { lang, pricing, license, stars, version, class: className } = Astro.props;
-const hasAny = pricing.length > 0 || license || typeof stars === 'number' || version;
+const { lang, pricing, license, stars, version, released, class: className } = Astro.props;
+const t = useTranslations(lang);
+const hasAny =
+  pricing.length > 0 || license || typeof stars === 'number' || version || released;
 ---
 
 {
@@ -29,6 +32,15 @@ const hasAny = pricing.length > 0 || license || typeof stars === 'number' || ver
       {version && (
         <span class="rounded-full border border-[var(--aas-border)] px-2 py-0.5 font-mono text-[var(--aas-muted)]">
           {version}
+        </span>
+      )}
+      {released && (
+        <span
+          title={t('meta.released')}
+          class="inline-flex items-center gap-1 rounded-full border border-[var(--aas-border)] px-2 py-0.5 text-[var(--aas-muted)]"
+        >
+          <span aria-hidden="true">↻</span>
+          {released}
         </span>
       )}
       {pricing.map((p) => (
