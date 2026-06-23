@@ -26,14 +26,23 @@ const icons: Record<string, string> = {
 };
 const icon = (category && icons[category]) || icons.default;
 
+// Resolve a `logo` to a real src: external URLs as-is, otherwise a public/
+// path prefixed with the site base (so it works under /awesome-agent-stack/).
+const base = import.meta.env.BASE_URL;
+const logoSrc = logo
+  ? /^https?:\/\//.test(logo)
+    ? logo
+    : base.replace(/\/$/, '') + '/' + logo.replace(/^\//, '')
+  : undefined;
+
 const boxStyle = `width:${size}px;height:${size}px`;
 const iconSize = Math.round(size * 0.52);
 ---
 
 {
-  logo ? (
+  logoSrc ? (
     <img
-      src={logo}
+      src={logoSrc}
       alt={name}
       width={size}
       height={size}
