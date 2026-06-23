@@ -41,6 +41,7 @@ const entries = (await getStacksByTag(lang, tag)).sort((a, b) =>
         logo={e.data.logo}
         repo={e.data.repo}
         version={e.data.version}
+        deprecated={e.data.deprecated}
       />
     ))
   }

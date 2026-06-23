@@ -82,6 +82,7 @@ const renderedSamples = hasSamples ? await renderSamples(data.samples) : [];
     stars={stats?.stars}
     version={displayVersion}
     released={stats?.releasedAt?.slice(0, 10)}
+    deprecated={data.deprecated}
     class="mt-5"
   />
 

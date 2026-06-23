@@ -54,6 +54,15 @@ html {
   border: 1px solid color-mix(in srgb, var(--aas-text) 7%, transparent);
   color: var(--aas-muted);
 }
+/* Deprecated / maintenance-only badge — amber warning surface. */
+.aas-deprecated {
+  background: color-mix(in srgb, #d97706 16%, transparent);
+  border: 1px solid color-mix(in srgb, #d97706 35%, transparent);
+  color: #b45309;
+}
+:root[data-theme='dark'] .aas-deprecated {
+  color: #fbbf24;
+}
 /* Pricing chip: a soft accent-tinted surface with a faint accent outline. */
 .aas-pricing {
   background: color-mix(in srgb, var(--aas-accent) 12%, transparent);
