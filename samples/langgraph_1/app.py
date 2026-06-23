@@ -16,9 +16,9 @@ import sys
 
 import litellm
 from dotenv import load_dotenv
+from langchain.agents import create_agent
 from langchain_litellm import ChatLiteLLM
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
 
 # Load .env when running locally; in Docker the keys come from --env-file.
 load_dotenv()
@@ -50,7 +50,7 @@ def main() -> None:
 
     # MODEL chooses the provider (claude-opus-4-8 / gpt-4o / gemini/gemini-2.5-flash).
     model = ChatLiteLLM(model=os.environ.get("MODEL", "claude-opus-4-8"), temperature=0)
-    agent = create_react_agent(model, tools=[multiply, is_prime])
+    agent = create_agent(model, tools=[multiply, is_prime])
 
     result = agent.invoke({"messages": [{"role": "user", "content": question}]})
     print(result["messages"][-1].content)
