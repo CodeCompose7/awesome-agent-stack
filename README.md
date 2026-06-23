@@ -111,6 +111,19 @@ samples:
 Detail pages also render a sticky right-rail **table of contents** (h2–h3, from
 `render()`'s `headings`); on the Code tab it becomes the version list.
 
+### Runnable samples (the "Implementation" tab)
+
+Beyond the illustrative code samples, a tool can ship a **real, runnable
+mini-project** under `samples/<slug>/` (a standalone folder with source, a
+`Dockerfile`, and a README — e.g. [`samples/langgraph/`](samples/langgraph/)).
+
+When `samples/<slug>/` exists, the detail page gains a third **Implementation**
+tab that reads those files at build time ([`src/lib/project.ts`](src/lib/project.ts))
+and shows each one syntax-highlighted, plus a link to the folder on GitHub.
+GitHub Pages can't execute them — visitors download the folder and run it with
+Docker (`docker build` / `docker run -e ANTHROPIC_API_KEY=…`). Drop in a folder
+and the tab appears automatically; no per-tool wiring.
+
 - **Mermaid** diagrams work both in the Overview body (a ```mermaid fenced
   block) and per-sample via `diagram:`. They render on the client and recolor
   with the light/dark theme ([`MermaidLoader.astro`](src/components/MermaidLoader.astro)).

@@ -1,0 +1,62 @@
+---
+import { codeToHtml } from 'shiki';
+import { useTranslations, type Lang } from '../i18n/ui';
+import type { ProjectFile } from '../lib/project';
+
+interface Props {
+  lang: Lang;
+  slug: string;
+  files: ProjectFile[];
+}
+
+const { lang, slug, files } = Astro.props;
+const t = useTranslations(lang);
+const folderUrl = `https://github.com/codecompose7/awesome-agent-stack/tree/main/samples/${slug}`;
+
+const rendered = await Promise.all(
+  files.map(async (f) => {
+    let html: string;
+    try {
+      html = await codeToHtml(f.content, { lang: f.lang, theme: 'github-dark' });
+    } catch {
+      html = await codeToHtml(f.content, { lang: 'text', theme: 'github-dark' });
+    }
+    return { ...f, html };
+  }),
+);
+---
+
+<div>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <p class="text-sm text-[var(--aas-muted)]">{t('project.intro')}</p>
+    <a
+      href={folderUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="aas-lift rounded-lg border border-[var(--aas-border)] bg-[var(--aas-panel)] px-3 py-1.5 text-sm text-[var(--aas-text)] no-underline"
+    >
+      {t('project.viewOnGitHub')} <span class="text-[var(--aas-muted)]">&nearr;</span>
+    </a>
+  </div>
+
+  <div class="mt-4 space-y-4">
+    {
+      rendered.map((f) => (
+        <figure class="overflow-hidden rounded-xl border border-[var(--aas-border)]">
+          <figcaption class="border-b border-[var(--aas-border)] bg-[var(--aas-panel)] px-3.5 py-2 font-mono text-xs text-[var(--aas-muted)]">
+            {f.path}
+          </figcaption>
+          <div class="aas-projfile overflow-x-auto" set:html={f.html} />
+        </figure>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .aas-projfile :global(pre.shiki) {
+    margin: 0;
+    padding: 1rem 1.1rem;
+    overflow-x: auto;
+  }
+</style>

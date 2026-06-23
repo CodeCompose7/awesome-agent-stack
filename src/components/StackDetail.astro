@@ -11,9 +11,11 @@ import DetailTabs from './DetailTabs.astro';
 import CodeSamples from './CodeSamples.astro';
 import MermaidLoader from './MermaidLoader.astro';
 import RelatedTools from './RelatedTools.astro';
+import ProjectViewer from './ProjectViewer.astro';
 import Toc from './Toc.astro';
 import { getRepoStats } from '../lib/github';
 import { renderSamples } from '../lib/samples';
+import { getProject } from '../lib/project';
 
 interface Props {
   entry: StackEntry;
@@ -44,6 +46,11 @@ const links = [
 
 const hasSamples = data.samples.length > 0;
 const renderedSamples = hasSamples ? await renderSamples(data.samples) : [];
+
+// A real runnable mini-project under samples/<slug>/, if present.
+const slug = slugOf(entry);
+const project = getProject(slug);
+const hasTabs = hasSamples || project !== null;
 ---
 
 <a href={getRelativeLocaleUrl(lang, '')} class="text-sm text-[var(--aas-accent)] no-underline"
@@ -108,14 +115,25 @@ const renderedSamples = hasSamples ? await renderSamples(data.samples) : [];
 {/* Full-width content; the TOC is a fixed right rail, out of this flow. */}
 <div class="mt-8 min-w-0">
   {
-    hasSamples ? (
-      <DetailTabs overviewLabel={t('tab.overview')} codeLabel={t('tab.code')}>
+    hasTabs ? (
+      <DetailTabs
+        overviewLabel={t('tab.overview')}
+        codeLabel={hasSamples ? t('tab.code') : undefined}
+        implLabel={project ? t('tab.impl') : undefined}
+      >
         <article slot="overview" class="prose max-w-none">
           <Content />
         </article>
-        <div slot="code">
-          <CodeSamples samples={renderedSamples} lang={lang} />
-        </div>
+        {hasSamples && (
+          <div slot="code">
+            <CodeSamples samples={renderedSamples} lang={lang} />
+          </div>
+        )}
+        {project && (
+          <div slot="impl">
+            <ProjectViewer lang={lang} slug={slug} files={project} />
+          </div>
+        )}
       </DetailTabs>
     ) : (
       <article class="prose max-w-none">
