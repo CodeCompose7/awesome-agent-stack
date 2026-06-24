@@ -14,7 +14,7 @@ const t = useTranslations(lang);
 
 <div class="aas-samples" data-samples>
   <div class="flex items-center gap-2 text-sm text-[var(--aas-muted)]">
-    {t('sample.version')}
+    {t('sample.example')}
     <details class="aas-vdd" data-samples-dd>
       <summary
         class="flex cursor-pointer list-none items-center gap-2 rounded-lg border border-[var(--aas-border)] bg-[var(--aas-panel)] px-3 py-1.5 text-[var(--aas-text)] select-none"
@@ -96,12 +96,12 @@ const t = useTranslations(lang);
     const options = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-sample-option]'));
     const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-sample-panel]'));
 
-    // The selected version lives in ?v= (0 is the default, so it's omitted).
+    // The selected example lives in ?v=, always reflected (even index 0) so it
+    // matches how the impl tab always carries its ?ex=.
     const V_PARAM = 'v';
     function writeV(index: string) {
       const url = new URL(location.href);
-      if (index === '0') url.searchParams.delete(V_PARAM);
-      else url.searchParams.set(V_PARAM, index);
+      url.searchParams.set(V_PARAM, index);
       history.replaceState(null, '', url.pathname + url.search + url.hash);
     }
 
