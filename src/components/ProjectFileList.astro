@@ -56,16 +56,13 @@ const tree = foldersFirst(buildTree(files));
 
 {
   files.length > 0 && (
-    <div
-      class:list={[
-        'rounded-xl border border-[var(--aas-border)] bg-[var(--aas-panel)] p-1.5',
-        className,
-      ]}
-    >
-      <p class="px-2 pt-1 pb-2 text-xs font-semibold tracking-wide text-[var(--aas-muted)] uppercase">
+    <div class:list={['text-sm', className]}>
+      <p class="mb-2 text-xs font-semibold tracking-wide text-[var(--aas-muted)] uppercase">
         {t('project.files')}
       </p>
-      <ProjectFileTree folder={folder} nodes={tree} />
+      <div class="rounded-xl border border-[var(--aas-border)] bg-[var(--aas-panel)] p-1.5">
+        <ProjectFileTree folder={folder} nodes={tree} />
+      </div>
     </div>
   )
 }

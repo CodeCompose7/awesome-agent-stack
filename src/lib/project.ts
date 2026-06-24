@@ -38,12 +38,56 @@ export interface ProjectFile {
   path: string; // relative to the project folder, e.g. "app.py"
   html: string; // Shiki-highlighted
 }
+export interface ProjectHeading {
+  slug: string;
+  text: string;
+  depth: number;
+}
 export interface RenderedProject {
   folder: string;
   name: string;
   readmeHtml?: string;
+  headings: ProjectHeading[]; // README h2/h3, for the right-rail TOC
   files: ProjectFile[];
   folderUrl: string;
+}
+
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[^\p{L}\p{N} -]/gu, '')
+    .replace(/\s+/g, '-');
+}
+
+/**
+ * Render a project README to HTML, giving its h2/h3 stable ids (prefixed with
+ * the folder so headings stay unique across projects) plus a copy-link anchor,
+ * and collecting those headings for the right-rail TOC.
+ */
+function renderReadme(
+  md: MarkdownIt,
+  content: string,
+  folder: string,
+): { html: string; headings: ProjectHeading[] } {
+  const tokens = md.parse(content, {});
+  const headings: ProjectHeading[] = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const tk = tokens[i];
+    if (tk.type === 'heading_open' && (tk.tag === 'h2' || tk.tag === 'h3')) {
+      const text = tokens[i + 1]?.content ?? '';
+      const slug = `${folder}-${slugify(text)}`;
+      tk.attrSet('id', slug);
+      headings.push({ slug, text, depth: tk.tag === 'h2' ? 2 : 3 });
+    }
+  }
+  const html = md.renderer.render(tokens, md.options, {}).replace(
+    /<(h[23]) id="([^"]+)">([\s\S]*?)<\/\1>/g,
+    (_m, tag, id, inner) =>
+      `<${tag} id="${id}">` +
+      `<a class="aas-anchor" href="#${id}" aria-label="Copy link to section"></a>${inner}</${tag}>`,
+  );
+  return { html, headings };
 }
 
 function langFor(name: string): string {
@@ -144,17 +188,18 @@ export async function renderProjects(folders: string[]): Promise<RenderedProject
     if (!shown.length) continue;
 
     let readmeHtml: string | undefined;
+    let headings: ProjectHeading[] = [];
     let name = folder;
     const files: ProjectFile[] = [];
     for (const f of shown.sort((a, b) => priority(a.path) - priority(b.path) || a.path.localeCompare(b.path))) {
       if (/^readme\.md$/i.test(f.path)) {
-        readmeHtml = md.render(f.content);
+        ({ html: readmeHtml, headings } = renderReadme(md, f.content, folder));
         name = f.content.match(/^#\s+(.+?)\s*$/m)?.[1] ?? folder;
       } else {
         files.push({ path: f.path, html: highlight(hl, f.content, langFor(f.name)) });
       }
     }
-    out.push({ folder, name, readmeHtml, files, folderUrl: `${REPO}/tree/main/samples/${folder}` });
+    out.push({ folder, name, readmeHtml, headings, files, folderUrl: `${REPO}/tree/main/samples/${folder}` });
   }
   return out;
 }

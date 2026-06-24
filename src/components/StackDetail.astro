@@ -80,6 +80,7 @@ function resolveTool(slug: string): RelatedTool {
 const projectRail = projects.map((p) => ({
   folder: p.folder,
   files: p.files,
+  headings: p.headings,
   tools: (relatedByFolder.get(p.folder) ?? []).map(resolveTool),
 }));
 const relatedToolsByFolder = new Map(projectRail.map((p) => [p.folder, p.tools]));
@@ -198,6 +199,7 @@ const relatedToolsByFolder = new Map(projectRail.map((p) => [p.folder, p.tools])
         <div data-toc="impl" class="hidden">
           {projectRail.map((pr, i) => (
             <div data-project-related={pr.folder} class:list={[i === 0 ? '' : 'hidden', 'space-y-5']}>
+              <Toc items={pr.headings} title={t('toc.onThisPage')} />
               <ProjectRelatedTools lang={lang} tools={pr.tools} />
               <ProjectFileList lang={lang} folder={pr.folder} files={pr.files} />
             </div>
