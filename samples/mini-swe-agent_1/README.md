@@ -75,3 +75,35 @@ python app.py "Print the result of 2 + 2 using a single shell command, then subm
 [Anthropic](https://console.anthropic.com/),
 [OpenAI](https://platform.openai.com/api-keys), or
 [Google AI Studio](https://aistudio.google.com/apikey).
+
+---
+
+## Example run
+
+> Output varies by model and run — LLMs are non-deterministic, so the exact
+> wording (and an agent's steps) differ each time. Below is one run with
+> `claude-opus-4-8`.
+
+````text
+--- assistant ---
+THOUGHT: The task simply asks to print the result of 2 + 2 using a single shell command. Let me do that.
+
+```mswea_bash_command
+echo $((2 + 2))
+```
+
+--- user ---
+<returncode>0</returncode>
+<output>
+4
+</output>
+
+--- assistant ---
+THOUGHT: The command printed 4 as expected. Now I'll submit.
+
+```mswea_bash_command
+echo COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT
+```
+
+=== Submitted ===
+````

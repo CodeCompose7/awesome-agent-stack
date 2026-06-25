@@ -68,3 +68,15 @@ python app.py "Summarize litellm in one line."
 [Anthropic](https://console.anthropic.com/),
 [OpenAI](https://platform.openai.com/api-keys), or
 [Google AI Studio](https://aistudio.google.com/apikey).
+
+---
+
+## Example run
+
+> Output varies by model and run — LLMs are non-deterministic, so the exact
+> wording (and an agent's steps) differ each time. Below is one run with
+> `claude-opus-4-8`.
+
+```text
+LiteLLM is an open-source library that provides a unified interface to call 100+ LLM APIs (OpenAI, Anthropic, Azure, Cohere, etc.) using the OpenAI format.
+```

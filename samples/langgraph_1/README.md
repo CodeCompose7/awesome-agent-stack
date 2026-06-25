@@ -70,3 +70,15 @@ python app.py "What is 24 * 7, and is the result prime?"
 [Anthropic](https://console.anthropic.com/),
 [OpenAI](https://platform.openai.com/api-keys), or
 [Google AI Studio](https://aistudio.google.com/apikey).
+
+---
+
+## Example run
+
+> Output varies by model and run — LLMs are non-deterministic, so the exact
+> wording (and an agent's steps) differ each time. Below is one run with
+> `claude-opus-4-8`.
+
+```text
+24 * 7 = **168**, and it is **not prime**. (168 is even and has many factors, such as 2, 3, 4, 6, 7, 8, etc.)
+```

@@ -54,3 +54,24 @@ python app.py "What should I wear in Seoul today?"
 ```
 
 `python-dotenv` loads `.env` automatically.
+
+---
+
+## Example run
+
+> Output varies by model and run — LLMs are non-deterministic, so the exact
+> wording (and an agent's steps) differ each time. Below is one run with
+> `claude-opus-4-8`.
+
+```text
+I'll check the current weather in Seoul to help you decide what to wear.
+[tool call] get_weather({'city': 'Seoul'})
+It's a beautiful day in Seoul today—**22°C and sunny**! Here's what I'd recommend:
+
+- A light long-sleeve shirt or a t-shirt
+- Comfortable pants, jeans, or a skirt/dress
+- A light jacket or cardigan if you tend to get chilly, especially in the evening
+- Sunglasses, maybe a hat, and a bit of sunscreen since it's sunny
+...
+22°C is mild and pleasant—no need for heavy layers. Enjoy your day!
+```

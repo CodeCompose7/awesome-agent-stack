@@ -74,3 +74,34 @@ python app.py "Print the result of 2 + 2 using a single shell command, then subm
 [Anthropic](https://console.anthropic.com/),
 [OpenAI](https://platform.openai.com/api-keys),
 [Google AI Studio](https://aistudio.google.com/apikey).
+
+---
+
+## 실행 결과
+
+> 모델과 실행마다 결과가 달라집니다 — LLM은 비결정적이라 표현(그리고 에이전트의
+> 구체적 단계)이 매번 다릅니다. 아래는 `claude-opus-4-8`로 실행한 한 예입니다.
+
+````text
+--- assistant ---
+THOUGHT: The task simply asks to print the result of 2 + 2 using a single shell command. Let me do that.
+
+```mswea_bash_command
+echo $((2 + 2))
+```
+
+--- user ---
+<returncode>0</returncode>
+<output>
+4
+</output>
+
+--- assistant ---
+THOUGHT: The command printed 4 as expected. Now I'll submit.
+
+```mswea_bash_command
+echo COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT
+```
+
+=== Submitted ===
+````

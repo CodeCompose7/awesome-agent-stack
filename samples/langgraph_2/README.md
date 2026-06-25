@@ -87,3 +87,40 @@ python app.py "How many times does the letter r appear in strawberry? Show it up
 [Anthropic](https://console.anthropic.com/),
 [OpenAI](https://platform.openai.com/api-keys), or
 [Google AI Studio](https://aistudio.google.com/apikey).
+
+---
+
+## Example run
+
+> Output varies by model and run — LLMs are non-deterministic, so the exact
+> wording (and an agent's steps) differ each time. Below is one run with
+> `claude-opus-4-8`.
+
+```text
+================================ Human Message =================================
+
+How many times does the letter r appear in strawberry? Show it uppercased.
+================================== Ai Message ==================================
+
+I'll count the letter "r" in "strawberry" and show it uppercased.
+Tool Calls:
+  count_letter (toolu_01XSgSztFUZEggtCkxLYr7BF)
+ Call ID: toolu_01XSgSztFUZEggtCkxLYr7BF
+  Args:
+    word: strawberry
+    letter: r
+  to_upper (toolu_01Jozend9wz6cpjoyjMFq9Xx)
+ Call ID: toolu_01Jozend9wz6cpjoyjMFq9Xx
+  Args:
+    text: strawberry
+================================= Tool Message =================================
+Name: to_upper
+
+STRAWBERRY
+================================== Ai Message ==================================
+
+The letter **r** appears **3 times** in "STRAWBERRY".
+
+=== answer ===
+The letter **r** appears **3 times** in "STRAWBERRY".
+```

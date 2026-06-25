@@ -70,3 +70,15 @@ python app.py "Why is the sky blue?"
 [Anthropic](https://console.anthropic.com/),
 [OpenAI](https://platform.openai.com/api-keys), or
 [Google AI Studio](https://aistudio.google.com/apikey).
+
+---
+
+## Example run
+
+> Output varies by model and run — LLMs are non-deterministic, so the exact
+> wording (and an agent's steps) differ each time. Below is one run with
+> `claude-opus-4-8`.
+
+```text
+The sky is blue because of a process called Rayleigh scattering. Sunlight is made up of all colors, but as it passes through Earth's atmosphere, the shorter blue wavelengths are scattered in all directions by air molecules much more than the longer red wavelengths. This scattered blue light fills the sky, making it appear blue to our eyes.
+```
