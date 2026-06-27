@@ -32,6 +32,12 @@ const stats = await getRepoStats(repo);
 const displayVersion = stats?.version ?? version;
 // Warn when an open-source project's latest release is getting old (6m / 1y).
 const staleness = pricing.includes('open-source') ? stalenessOf(stats?.releasedAt) : 'fresh';
+// Months since the latest release, for the "last updated" freshness filter
+// (open-source only; others have no meaningful release cadence to flag).
+const releaseMs = pricing.includes('open-source') ? Date.parse(stats?.releasedAt ?? '') : NaN;
+const updateMonths = Number.isNaN(releaseMs)
+  ? ''
+  : String(Math.floor((Date.now() - releaseMs) / (30.44 * 24 * 60 * 60 * 1000)));
 
 // Data for client-side search / filter / sort (used on the homepage).
 const langTokens = (language ?? '')
@@ -54,7 +60,7 @@ const searchText = `${name} ${description} ${tags.join(' ')}`.toLowerCase();
   data-langs={langTokens.join('|')}
   data-stars={typeof stats?.stars === 'number' ? String(stats.stars) : ''}
   data-date={stats?.releasedAt?.slice(0, 10) ?? ''}
-  data-staleness={staleness === 'stale' ? 'stale aging' : staleness === 'aging' ? 'aging' : ''}
+  data-updatemonths={updateMonths}
 >
   {/* Left column: the content. Grows; chips on the right don't push it down. */}
   <div class="flex min-w-0 flex-1 flex-col">

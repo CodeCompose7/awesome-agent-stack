@@ -4,7 +4,6 @@ import StackCard from './StackCard.astro';
 import ChevronDown from './ChevronDown.astro';
 import { rootCategories, descendantIds } from '../data/categories';
 import { getStacks, slugOf } from '../lib/stacks';
-import { getRepoStats, stalenessOf } from '../lib/github';
 import { pricingTags } from '../lib/pricing';
 import { useTranslations, pricingLabels, licenseLabel, type Lang } from '../i18n/ui';
 
@@ -28,17 +27,6 @@ const byCategory = (categoryId: string) => {
 // Filter facet options, derived from the data.
 const pricingOrder = ['completely-free', 'open-source', 'free-tier', 'paid', 'free'];
 const usedPricing = new Set<string>(entries.flatMap((e) => pricingTags(e.data.pricing)));
-
-// "Last updated" facet, from each open-source tool's release age. A tool 1y+
-// stale also matches the milder 6m+ option, so stale entries seed both tokens.
-const statsList = await Promise.all(entries.map((e) => getRepoStats(e.data.repo)));
-const usedStaleness = new Set<string>();
-entries.forEach((e, i) => {
-  if (!e.data.pricing.includes('open-source')) return;
-  const s = stalenessOf(statsList[i]?.releasedAt);
-  if (s === 'stale') usedStaleness.add('stale').add('aging');
-  else if (s === 'aging') usedStaleness.add('aging');
-});
 
 const langSet = new Set(
   entries.flatMap((e) =>
@@ -68,15 +56,16 @@ const facets = [
     label: t('detail.language'),
     options: [...langSet].sort().map((l) => ({ value: l, label: l })),
   },
-  {
-    key: 'updated',
-    label: t('filter.updated'),
-    options: [
-      { value: 'aging', label: t('meta.aging') },
-      { value: 'stale', label: t('meta.stale') },
-    ].filter((o) => usedStaleness.has(o.value)),
-  },
-].filter((f) => f.options.length > 0);
+];
+
+// Single-select "last updated" filter: hide tools whose latest release is older
+// than the chosen threshold (in months). 0 = show everything (the default).
+const freshnessOptions = [
+  { months: 0, label: t('updated.all') },
+  { months: 6, label: t('meta.aging') },
+  { months: 12, label: t('meta.stale') },
+  { months: 24, label: t('updated.2y') },
+];
 
 const sortOptions = [
   { key: 'alpha', label: t('sort.alpha') },
@@ -127,6 +116,34 @@ const menuClass =
         </details>
       ))
     }
+
+    {/* Last-updated freshness — single select; hides tools older than the pick. */}
+    <details class="aas-dd" data-fresh-dd>
+      <summary class={summaryClass}>
+        <span class="text-[var(--aas-muted)]">{t('filter.updated')}:</span>
+        <span data-fresh-label>{freshnessOptions[0].label}</span>
+        <ChevronDown class="text-[var(--aas-muted)]" />
+      </summary>
+      <ul class={menuClass}>
+        {
+          freshnessOptions.map((o, i) => (
+            <li>
+              <button
+                type="button"
+                data-fresh={o.months}
+                aria-current={i === 0 ? 'true' : 'false'}
+                class="flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-[var(--aas-tint)] aria-[current=true]:font-semibold aria-[current=true]:text-[var(--aas-accent)]"
+              >
+                {o.label}
+                <span data-check aria-hidden="true" class="opacity-0">
+                  ✓
+                </span>
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+    </details>
 
     <details class="aas-dd sm:ml-auto">
       <summary class={summaryClass}>
@@ -219,10 +236,13 @@ const menuClass =
     const boxes = Array.from(root.querySelectorAll<HTMLInputElement>('input[data-facet]'));
     const sortBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-sort]'));
     const sortLabel = root.querySelector<HTMLElement>('[data-sort-label]')!;
+    const freshBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-fresh]'));
+    const freshLabel = root.querySelector<HTMLElement>('[data-fresh-label]')!;
     const clearBtn = root.querySelector<HTMLButtonElement>('[data-clear]')!;
     const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-section]'));
     const noResults = document.querySelector<HTMLElement>('[data-no-results]')!;
     let sort = 'alpha';
+    let fresh = 0; // hide tools whose latest release is older than this many months (0 = off)
 
     const alpha = (a: HTMLElement, b: HTMLElement) =>
       (a.dataset.name ?? '').localeCompare(b.dataset.name ?? '');
@@ -257,7 +277,6 @@ const menuClass =
         pricing: selected('pricing'),
         license: selected('license'),
         language: selected('language'),
-        updated: selected('updated'),
       };
       let total = 0;
       for (const section of sections) {
@@ -272,8 +291,9 @@ const menuClass =
             (!f.license.size || f.license.has(card.dataset.license ?? '')) &&
             (!f.language.size ||
               (card.dataset.langs ?? '').split('|').some((v) => f.language.has(v))) &&
-            (!f.updated.size ||
-              (card.dataset.staleness ?? '').split(' ').some((v) => f.updated.has(v)));
+            (!fresh ||
+              card.dataset.updatemonths === '' ||
+              Number(card.dataset.updatemonths) < fresh);
           card.hidden = !ok;
           if (ok) visible++;
         }
@@ -287,8 +307,8 @@ const menuClass =
       noResults.hidden = total !== 0;
 
       // Facet count badges + clear-button visibility.
-      let anyFilter = q.length > 0 || sort !== 'alpha';
-      for (const facet of ['pricing', 'license', 'language', 'updated']) {
+      let anyFilter = q.length > 0 || sort !== 'alpha' || fresh !== 0;
+      for (const facet of ['pricing', 'license', 'language']) {
         const n = selected(facet).size;
         const badge = root!.querySelector<HTMLElement>(`[data-facet-count="${facet}"]`)!;
         badge.textContent = String(n);
@@ -309,9 +329,19 @@ const menuClass =
         apply();
       }),
     );
+    freshBtns.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        fresh = Number(btn.dataset.fresh);
+        freshLabel.textContent = btn.textContent!.replace('✓', '').trim();
+        freshBtns.forEach((b) => b.setAttribute('aria-current', String(b === btn)));
+        btn.closest('details')?.removeAttribute('open');
+        apply();
+      }),
+    );
     clearBtn.addEventListener('click', () => {
       input.value = '';
       boxes.forEach((b) => (b.checked = false));
+      freshBtns[0].click(); // reset freshness to "show all"
       sortBtns[0].click();
     });
 
