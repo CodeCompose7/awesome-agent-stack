@@ -544,10 +544,33 @@ summary {
   background-size: cover;
   filter: blur(22px) saturate(1.25);
   transform: scale(1.6);
-  opacity: 0.4;
+  opacity: 0.32;
   pointer-events: none;
   -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent);
   mask-image: linear-gradient(to bottom, #000 50%, transparent);
+  animation: aas-bg-drift 22s ease-in-out infinite;
+}
+/* A gentle, slow drift so the backdrop feels alive without distracting. */
+@keyframes aas-bg-drift {
+  0%,
+  100% {
+    transform: scale(1.55) translate(-1.5%, -1%);
+  }
+  50% {
+    transform: scale(1.72) translate(1.5%, 1%);
+  }
+}
+/* Stagger neighbouring cards so they don't all drift in lockstep. */
+:root[data-view='gallery'] [data-tool]:nth-child(3n + 2) .aas-gallery-bg {
+  animation-delay: -7s;
+}
+:root[data-view='gallery'] [data-tool]:nth-child(3n + 3) .aas-gallery-bg {
+  animation-delay: -14s;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-view='gallery'] .aas-gallery-bg {
+    animation: none;
+  }
 }
 
 /* Density toggle buttons (standard / gallery). */
