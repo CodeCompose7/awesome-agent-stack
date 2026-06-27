@@ -17,7 +17,7 @@ samples:
       flowchart LR
         call[your function] --> t["@track"]
         t --> opik[(Opik)]
-        opik --> ui[traces · scores]
+        opik --> ui[traces / scores]
     code: |
       from opik import track
 
@@ -43,7 +43,7 @@ It runs self-hosted or as managed Comet Cloud, and integrates with popular frame
 flowchart LR
   call[your function] --> t["@track"]
   t --> opik[(Opik)]
-  opik --> ui[traces · scores]
+  opik --> ui[traces / scores]
 ```
 
 The **Code samples** tab shows tracing a function with `@track`.

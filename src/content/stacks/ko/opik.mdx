@@ -17,7 +17,7 @@ samples:
       flowchart LR
         call[your function] --> t["@track"]
         t --> opik[(Opik)]
-        opik --> ui[traces · scores]
+        opik --> ui[traces / scores]
     code: |
       from opik import track
 
@@ -43,7 +43,7 @@ Opik은 Comet이 만든 오픈소스 LLM 관측 플랫폼으로, 트레이싱·�
 flowchart LR
   call[your function] --> t["@track"]
   t --> opik[(Opik)]
-  opik --> ui[traces · scores]
+  opik --> ui[traces / scores]
 ```
 
 **코드 샘플** 탭에서 `@track`으로 함수를 트레이싱하는 예를 보여줍니다.

@@ -18,9 +18,9 @@ samples:
     lang: python
     diagram: |
       flowchart LR
-        qa[question · answer · context] --> r[Ragas]
+        qa[question / answer / context] --> r[Ragas]
         r --> judge[(LLM judge)]
-        r --> scores[faithfulness · relevancy]
+        r --> scores[faithfulness / relevancy]
     code: |
       from ragas import evaluate
       from ragas.metrics import faithfulness, answer_relevancy
@@ -50,9 +50,9 @@ Ragas는 RAG 파이프라인과 LLM 애플리케이션을 평가하는 오픈소
 
 ```mermaid
 flowchart LR
-  qa[question · answer · context] --> r[Ragas]
+  qa[question / answer / context] --> r[Ragas]
   r --> judge[(LLM judge)]
-  r --> scores[faithfulness · relevancy]
+  r --> scores[faithfulness / relevancy]
 ```
 
 **코드 샘플** 탭에서 최소 RAG 평가를 보여줍니다.

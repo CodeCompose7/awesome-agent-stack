@@ -18,9 +18,9 @@ samples:
     lang: python
     diagram: |
       flowchart LR
-        qa[question · answer · context] --> r[Ragas]
+        qa[question / answer / context] --> r[Ragas]
         r --> judge[(LLM judge)]
-        r --> scores[faithfulness · relevancy]
+        r --> scores[faithfulness / relevancy]
     code: |
       from ragas import evaluate
       from ragas.metrics import faithfulness, answer_relevancy
@@ -50,9 +50,9 @@ It turns "does this RAG system actually work?" into numbers you can track in CI 
 
 ```mermaid
 flowchart LR
-  qa[question · answer · context] --> r[Ragas]
+  qa[question / answer / context] --> r[Ragas]
   r --> judge[(LLM judge)]
-  r --> scores[faithfulness · relevancy]
+  r --> scores[faithfulness / relevancy]
 ```
 
 The **Code samples** tab shows a minimal RAG evaluation.

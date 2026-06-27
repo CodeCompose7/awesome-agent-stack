@@ -74,7 +74,7 @@ You give it a goal and a repo; it does the multi-step work and shows you the dif
 flowchart LR
   goal[goal + repo] --> agent[OpenHands]
   agent --> sandbox[(sandboxed runtime)]
-  sandbox -->|edit · run · browse| agent
+  sandbox -->|edit / run / browse| agent
   agent --> diff[diff]
 ```
 
