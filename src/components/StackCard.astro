@@ -19,12 +19,13 @@ interface Props {
   language?: string;
   category?: string;
   logo?: string;
+  logoDark?: string;
   repo?: string;
   version?: string;
   deprecated?: boolean;
 }
 
-const { slug, lang, name, formerNames = [], description, tags, pricing, license, language, category, logo, repo, version, deprecated } =
+const { slug, lang, name, formerNames = [], description, tags, pricing, license, language, category, logo, logoDark, repo, version, deprecated } =
   Astro.props;
 const t = useTranslations(lang);
 const href = getRelativeLocaleUrl(lang, `stacks/${slug}/`);
@@ -67,7 +68,7 @@ const searchText = `${name} ${description} ${tags.join(' ')}`.toLowerCase();
   {/* Left column: the content. Grows; chips on the right don't push it down. */}
   <div class="flex min-w-0 flex-1 flex-col">
     <div class="flex min-w-0 items-center gap-3">
-      <ToolAvatar name={name} logo={logo} category={category} size={40} />
+      <ToolAvatar name={name} logo={logo} logoDark={logoDark} category={category} size={40} />
       <div class="min-w-0">
         <h3 class="truncate text-base font-semibold text-[var(--aas-text)]">
           <a href={href} class="no-underline after:absolute after:inset-0 after:content-['']">

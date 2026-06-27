@@ -18,6 +18,7 @@ const stacks = defineCollection({
     category: z.string(),
     description: z.string(),
     logo: z.string().optional(), // optional image URL/path; otherwise a monogram is shown
+    logoDark: z.string().optional(), // optional dark-theme variant of `logo`
     website: z.string().url().optional(),
     repo: z.string().url().optional(),
     docs: z.string().url().optional(),

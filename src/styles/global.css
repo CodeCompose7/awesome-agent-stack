@@ -99,6 +99,17 @@ html {
 :root[data-theme='dark'] .aas-free {
   color: #4ade80;
 }
+/* Theme-aware logos: show only the variant matching the active theme
+   (ToolAvatar emits both when a logoDark is set). */
+.aas-logo-dark {
+  display: none;
+}
+:root[data-theme='dark'] .aas-logo-light {
+  display: none;
+}
+:root[data-theme='dark'] .aas-logo-dark {
+  display: revert;
+}
 
 /* Subtle "lift + shadow" on hover for cards and button-like elements. */
 .aas-lift {

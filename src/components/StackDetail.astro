@@ -86,6 +86,7 @@ function resolveTool(slug: string): RelatedTool {
     name: e.data.name,
     registered: true,
     logo: e.data.logo,
+    logoDark: e.data.logoDark,
     category: e.data.category,
     deprecated: e.data.deprecated,
   };
@@ -105,7 +106,7 @@ const relatedToolsByFolder = new Map(projectRail.map((p) => [p.folder, p.tools])
 
 <header class="mt-4 pb-6">
   <div class="flex items-center gap-4">
-    <ToolAvatar name={data.name} logo={data.logo} category={data.category} size={56} />
+    <ToolAvatar name={data.name} logo={data.logo} logoDark={data.logoDark} category={data.category} size={56} />
     <div>
       <h1 class="text-3xl font-bold tracking-tight">{data.name}</h1>
       {data.formerNames.length > 0 && (
