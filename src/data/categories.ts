@@ -68,6 +68,18 @@ export const categories: Category[] = [
           ko: '프롬프팅을 프로그래밍처럼 다룹니다. 문자열을 손으로 튜닝하는 대신 모듈을 선언하면, 프레임워크가 지표에 맞춰 프롬프트를 컴파일하고 최적화합니다.',
         },
       },
+      {
+        id: 'framework-rag',
+        label: { en: 'RAG & Data Frameworks', ko: 'RAG·데이터 프레임워크' },
+        description: {
+          en: 'Frameworks for retrieval-augmented generation and data-centric agents.',
+          ko: '검색 증강 생성(RAG)과 데이터 중심 에이전트를 위한 프레임워크.',
+        },
+        detail: {
+          en: 'For retrieval-heavy apps — ingest, index, and query your data, then ground the model in it. The backbone of RAG pipelines and data agents.',
+          ko: '검색 중심 앱을 위한 것 — 데이터를 수집·색인·질의한 뒤 모델을 그 데이터에 근거하게 한다. RAG 파이프라인과 데이터 에이전트의 중심.',
+        },
+      },
     ],
   },
   {
