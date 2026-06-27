@@ -510,3 +510,8 @@ summary {
   background: var(--aas-tint);
   color: var(--aas-text);
 }
+
+/* Gallery: among the pricing chips, keep only the open-source badge. */
+:root[data-view='gallery'] [data-tool] [data-pricing-tag]:not([data-pricing-tag='open-source']) {
+  display: none;
+}

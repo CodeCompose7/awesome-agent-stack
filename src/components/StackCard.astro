@@ -136,6 +136,7 @@ const searchText = `${name} ${description} ${tags.join(' ')}`.toLowerCase();
     {
       pricingTags(pricing).map((p) => (
         <span
+          data-pricing-tag={p}
           class:list={[p === COMPLETELY_FREE ? 'aas-free' : 'aas-pricing', 'rounded-lg px-2.5 py-1']}
         >
           {pricingLabels[lang][p] ?? p}
