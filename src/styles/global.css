@@ -111,18 +111,21 @@ html {
   display: revert;
 }
 
-/* Subtle "lift + shadow" on hover for cards and button-like elements. */
+/* Subtle "lift + shadow" on hover for cards and button-like elements. Gated to
+   devices with real hover, so the effect never "sticks" after a tap on touch. */
 .aas-lift {
   transition:
     transform 0.16s ease,
     box-shadow 0.16s ease,
     border-color 0.16s ease;
 }
-.aas-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--aas-shadow);
+@media (hover: hover) {
+  .aas-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--aas-shadow);
+  }
 }
-@media (prefers-reduced-motion: reduce) {
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
   .aas-lift:hover {
     transform: none;
   }
