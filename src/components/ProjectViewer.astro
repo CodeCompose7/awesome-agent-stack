@@ -78,18 +78,19 @@ function splitReadme(html?: string): { titleInner?: string; body?: string } {
 
         {readme.titleInner && (
           <div class="mt-5" data-readme>
+            <span
+              class="block text-2xl font-bold tracking-tight text-[var(--aas-text)]"
+              set:html={readme.titleInner}
+            />
             <button
               type="button"
               data-readme-toggle
               aria-expanded="true"
-              aria-label={t('project.readmeToggle')}
-              class="flex w-full items-center justify-between gap-3 text-left"
+              class="mt-2 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm text-[var(--aas-muted)] hover:bg-[var(--aas-tint)] hover:text-[var(--aas-text)]"
             >
-              <span
-                class="text-2xl font-bold tracking-tight text-[var(--aas-text)]"
-                set:html={readme.titleInner}
-              />
-              <ChevronDown class="aas-readme-chevron shrink-0 text-[var(--aas-muted)] transition-transform" />
+              <ChevronDown class="aas-readme-chevron transition-transform" />
+              <span data-readme-label-expand>{t('project.readmeExpand')}</span>
+              <span data-readme-label-collapse>{t('project.readmeCollapse')}</span>
             </button>
             {readme.body && (
               <div class="prose mt-3 max-w-none" data-readme-body set:html={readme.body} />
@@ -202,9 +203,13 @@ function splitReadme(html?: string): { titleInner?: string; body?: string } {
     padding: 1rem 1.1rem;
     overflow-x: auto;
   }
-  /* README toggle: rotate the chevron when collapsed. */
+  /* README toggle: rotate the chevron and swap the label by state. */
   [data-readme-toggle][aria-expanded='false'] .aas-readme-chevron {
     transform: rotate(-90deg);
+  }
+  [data-readme-toggle][aria-expanded='true'] [data-readme-label-expand],
+  [data-readme-toggle][aria-expanded='false'] [data-readme-label-collapse] {
+    display: none;
   }
 </style>
 
