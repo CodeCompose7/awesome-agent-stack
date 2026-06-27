@@ -510,7 +510,9 @@ summary {
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-size: 0.75rem;
-  opacity: 0.8;
+  /* Fade via colour, not opacity — opacity would create a stacking context and
+     lift the description above the card's full-card link overlay. */
+  color: color-mix(in srgb, var(--aas-muted) 78%, transparent);
 }
 /* Footer: stars + open-source chip, just spaced below the content. The chips
    drop their borders for a soft, tinted-pill look in this view. */
