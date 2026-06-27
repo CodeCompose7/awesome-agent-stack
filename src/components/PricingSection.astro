@@ -3,6 +3,7 @@
 // matching the other body headings. A short intro (`note`) sits above an
 // optional plan / price / note table. Driven by the frontmatter pricing fields.
 import { useTranslations, type Lang } from '../i18n/ui';
+import { stalenessOf } from '../lib/github';
 
 interface Tier {
   plan: string;
@@ -19,6 +20,9 @@ interface Props {
 const { lang, note, tiers = [], source, checkedAt } = Astro.props;
 const t = useTranslations(lang);
 const hasTable = tiers.length > 0;
+// Compare the as-of date with the build date: warn once pricing is 6m+ (aging)
+// or 1y+ (stale) old, so it gets re-verified.
+const freshness = stalenessOf(checkedAt);
 ---
 
 {
@@ -61,6 +65,17 @@ const hasTable = tiers.length > 0;
               {source ? ' · ' : ''}
               {`${t('detail.asOf')} ${checkedAt}`}
             </Fragment>
+          )}
+          {freshness !== 'fresh' && (
+            <span
+              title={t(freshness === 'stale' ? 'pricing.staleHint' : 'pricing.agingHint')}
+              class:list={[
+                freshness === 'stale' ? 'aas-stale' : 'aas-aging',
+                'ml-2 inline-block rounded-md px-2 py-0.5 text-xs font-medium',
+              ]}
+            >
+              {t(freshness === 'stale' ? 'pricing.stale' : 'pricing.aging')}
+            </span>
           )}
         </p>
       )}
