@@ -4,10 +4,11 @@ A ~40-line [LangGraph](https://github.com/langchain-ai/langgraph) ReAct agent
 with a single `web_search` tool backed by [Tavily](https://tavily.com). Ask it
 something only current data can answer — "today's USD→KRW rate" — and it
 searches the web, reads the fresh results, and answers with the number and its
-sources. The model is routed through LiteLLM, so the same code runs on Claude,
-OpenAI, or Gemini — change `MODEL` in `.env`.
+sources. The model is routed through LiteLLM, so the **same code** works with
+**Anthropic Claude**, **OpenAI**, or **Google AI Studio (Gemini)** — change
+`MODEL` in `.env`, never the code.
 
-## Setup
+## Configure
 
 ```bash
 cd samples/tavily_1
@@ -15,20 +16,55 @@ cp .env.sample .env
 # edit .env: set TAVILY_API_KEY, MODEL, and the matching provider key
 ```
 
-`TAVILY_API_KEY` is always required — it's the search tool. Then pick a model:
+`TAVILY_API_KEY` is always required — it's the search tool. Then `MODEL` picks
+the provider:
 
-| Provider | `MODEL` example | key in `.env` |
-| --- | --- | --- |
-| Anthropic Claude | `claude-opus-4-8` | `ANTHROPIC_API_KEY` |
-| OpenAI | `gpt-4o` | `OPENAI_API_KEY` |
-| Google AI Studio | `gemini/gemini-2.5-flash` | `GEMINI_API_KEY` |
+| Provider          | `MODEL` example           | Key in `.env`       |
+| ----------------- | ------------------------- | ------------------- |
+| Anthropic Claude  | `claude-opus-4-8`         | `ANTHROPIC_API_KEY` |
+| OpenAI            | `gpt-4o`                  | `OPENAI_API_KEY`    |
+| Google AI Studio  | `gemini/gemini-2.5-flash` | `GEMINI_API_KEY`    |
+
+`.env` is gitignored — only `.env.sample` is committed.
 
 ## Run with Docker
 
 ```bash
+cd samples/tavily_1
 docker build -t aas-tavily .
 docker run --rm --env-file .env aas-tavily "오늘 USD/KRW 환율은?"
 ```
+
+## Run with Docker (in a devcontainer with DooD)
+
+In a dev container that talks to the host Docker daemon (Docker-outside-of-Docker),
+the foreground `docker run` above often prints nothing and exits 0 — but the run
+itself succeeds. The script runs to completion and Docker captures all of its
+output; only the live **attached** stream drops it over the VM boundary. You can
+confirm this: `docker logs` on the same container shows the full output, the
+container exits 0, and it is **not** an OOM. Run **detached** and follow the logs
+instead:
+
+```bash
+cd samples/tavily_1
+docker build -t aas-tavily .
+docker logs -f "$(docker run -d --env-file .env aas-tavily \
+  "오늘 USD/KRW 환율은?")"
+```
+
+## Run locally
+
+```bash
+cd samples/tavily_1
+pip install -r requirements.txt
+python app.py "오늘 USD/KRW 환율은?"
+```
+
+`python-dotenv` loads `.env` automatically. Get the Tavily key from
+[Tavily](https://tavily.com), and model keys from
+[Anthropic](https://console.anthropic.com/),
+[OpenAI](https://platform.openai.com/api-keys), or
+[Google AI Studio](https://aistudio.google.com/apikey).
 
 ## How it works
 
@@ -42,9 +78,14 @@ The loop is the spine; the tool is what reaches the live web.
 Without the tool the model can only guess from stale training data; with it,
 the answer is grounded in today's web.
 
-## Example
+---
+
+## Example run
+
+> Output varies by model and run — LLMs are non-deterministic, so the exact
+> wording (and an agent's steps) differ each time. Below is one run with
+> `claude-opus-4-8`.
 
 ```text
-$ docker run --rm --env-file .env aas-tavily "오늘 USD/KRW 환율은?"
-오늘 USD/KRW 환율은 약 1,370원입니다. (출처: ...)
+Today (as of 2026-06-29) USD/KRW is about ₩1,370. (source: top search result)
 ```
