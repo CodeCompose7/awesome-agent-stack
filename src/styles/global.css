@@ -273,7 +273,7 @@ html {
    typical laptop) instead of StackDetail's ~1536px. Below that the rail hides
    and the centered column stands alone. */
 .aas-doc {
-  max-width: 44rem;
+  max-width: 50rem;
   margin-inline: auto;
 }
 .aas-doc-main {
@@ -282,14 +282,16 @@ html {
 .aas-doc-rail {
   display: none;
 }
-@media (min-width: 1200px) {
+@media (min-width: 1280px) {
   .aas-doc-rail {
     display: flex;
     flex-direction: column;
     position: fixed;
     top: 7rem;
-    /* just right of the centered 44rem column (half-width 22rem + 1.5rem gap) */
-    left: calc(50% + 23.5rem);
+    /* Just right of the centered 50rem column (half-width 25rem + 1.5rem gap),
+       clamped so the rail never crosses the viewport's right margin (13rem wide
+       + 1.5rem margin = 14.5rem) on the tighter end of the range. */
+    left: min(calc(50% + 26.5rem), calc(100vw - 14.5rem));
     width: 13rem;
     max-height: calc(100vh - 9rem);
   }
