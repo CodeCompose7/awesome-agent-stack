@@ -243,6 +243,9 @@ html {
   .aas-toc-rail {
     display: flex;
     flex-direction: column;
+    /* Sit on the LEFT of the content (source order stays content-first for a11y;
+       order pulls the rail visually ahead). */
+    order: -1;
     position: sticky;
     top: 7rem;
     align-self: flex-start;
