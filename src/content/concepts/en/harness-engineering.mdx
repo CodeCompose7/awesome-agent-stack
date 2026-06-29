@@ -93,11 +93,16 @@ The loop runs reason→call-tool→observe, then stops and reports once it passe
 
 ```mermaid
 flowchart LR
-  task["task"] --> step["reason → call tool → observe"]
-  step --> gate{"over a cap?"}
-  gate -- no --> step
+  task["task"] --> reason["reason"]
+  reason --> tool["call tool"]
+  tool --> obs["observe"]
+  obs --> gate{"over a cap?"}
+  gate -- no --> reason
   gate -- yes --> stop["stop · report"]
-  step -.log.-> trace[("tracing")]
+  reason -.log.-> trace[("tracing")]
+  tool -.log.-> trace
+  class reason roleModel
+  class tool roleTool
   class trace roleTrace
 ```
 
@@ -154,6 +159,7 @@ flowchart LR
   data --> model
   model --> out["answer"]
   class model roleModel
+  class tool roleTool
   class data roleSource
 ```
 
@@ -165,7 +171,7 @@ Runs model-written code in isolation, so a bad command can't touch your machine 
 
 #### Example. Isolating side effects
 
-Model-written code runs in a disposable, isolated environment, so a bad command can't reach the host.
+Model-written code runs in a disposable, isolated environment, so a bad command can't reach the host. For example, even if the model emits `rm -rf ~`, it only runs inside the sandbox and then disappears.
 
 - Accidentally deleting files or directories
 - Arbitrary outbound network requests
@@ -173,8 +179,9 @@ Model-written code runs in a disposable, isolated environment, so a bad command 
 
 ```mermaid
 flowchart LR
-  code["model-written code"] --> sandbox["code sandbox"]
+  code["model code — rm -rf ~"] --> sandbox["code sandbox"]
   sandbox -. isolates .- host["your machine · data"]
+  class sandbox roleSource
 ```
 
 <Tools slugs={["e2b"]} />
@@ -185,7 +192,7 @@ Validate and constrain input/output at runtime, before a bad result reaches a us
 
 #### Example. Stopping it before it lands
 
-Before output reaches a user, it's checked at runtime, and a violation is blocked or rewritten.
+Before output reaches a user, it's checked at runtime, and a violation is blocked or rewritten. For example, `my email is abc@test.com` becomes `my email is [redacted email]`.
 
 - Personal data or secret keys leaked verbatim
 - Profanity, hate, or other unsafe language
@@ -193,9 +200,11 @@ Before output reaches a user, it's checked at runtime, and a violation is blocke
 
 ```mermaid
 flowchart LR
-  out["model output"] --> guard{"guardrails"}
+  out["output: my email is abc@test.com"] --> guard{"guardrails"}
   guard -- pass --> user["user"]
-  guard -- violation --> block["block / rewrite"]
+  guard -- violation --> fix["mask: my email is ⟨redacted⟩"]
+  fix --> user
+  class guard roleGuard
 ```
 
 <Tools slugs={["guardrails-ai", "nemo-guardrails"]} />

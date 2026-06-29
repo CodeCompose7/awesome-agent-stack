@@ -121,6 +121,8 @@
   --aas-role-eval: #22c55e;
   --aas-role-trace: #f59e0b;
   --aas-role-source: #14b8a6;
+  --aas-role-tool: #8b5cf6;
+  --aas-role-guard: #f43f5e;
 }
 
 :root[data-theme="dark"] {
@@ -664,6 +666,14 @@ summary {
 .mermaid g.node.roleSource :is(rect, polygon, path) {
   fill: color-mix(in srgb, var(--aas-role-source) 15%, var(--aas-panel)) !important;
   stroke: color-mix(in srgb, var(--aas-role-source) 55%, transparent) !important;
+}
+.mermaid g.node.roleTool :is(rect, polygon, path) {
+  fill: color-mix(in srgb, var(--aas-role-tool) 14%, var(--aas-panel)) !important;
+  stroke: color-mix(in srgb, var(--aas-role-tool) 55%, transparent) !important;
+}
+.mermaid g.node.roleGuard :is(rect, polygon, path) {
+  fill: color-mix(in srgb, var(--aas-role-guard) 14%, var(--aas-panel)) !important;
+  stroke: color-mix(in srgb, var(--aas-role-guard) 55%, transparent) !important;
 }
 .mermaid g.cluster rect {
   rx: 18px;
