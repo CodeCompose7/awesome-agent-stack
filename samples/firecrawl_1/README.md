@@ -84,10 +84,12 @@ contents go straight into its reasoning.
 
 > Output varies by model and run — LLMs are non-deterministic, so the exact
 > wording (and an agent's steps) differ each time. Below is one run with
-> `claude-opus-4-8`.
+> `gemini/gemini-2.5-flash` (the answer is Korean because the question is).
 
 ```text
-Firecrawl's three core features: (1) Scrape — turn any URL into clean Markdown;
-(2) Crawl — walk a whole site and return every page; (3) Search — find pages and
-return their content in one call.
+Firecrawl의 핵심 기능 3가지는 다음과 같습니다:
+
+1. **웹 검색 (Web Search):** 웹에서 정보를 검색하는 기능입니다.
+2. **스크래핑 (Scraping):** 웹 페이지에서 데이터를 추출하는 기능입니다.
+3. **에이전트 (Agent):** 웹에서 데이터를 수집하는 데 사용되는 에이전트 기능입니다.
 ```
