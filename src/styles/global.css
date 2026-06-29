@@ -34,6 +34,62 @@
   font-display: swap;
 }
 
+/* Pretendard — the site's default gothic (sans) for Korean + Latin. */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Thin.woff2') format('woff2');
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraLight.woff2') format('woff2');
+  font-weight: 200;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-display: swap;
+}
+
 /* Light is the default; `data-theme="dark"` (set by the inline script in
    BaseLayout) switches to dark. The @media block covers no-JS users whose
    system prefers dark before any explicit choice is stored. */
@@ -50,6 +106,10 @@
      contrast on any background even when --aas-panel is near-white. Defined
      once; the var(--aas-text) inside resolves per theme. */
   --aas-tint: color-mix(in srgb, var(--aas-text) 7%, transparent);
+  /* Default gothic (sans) stack — Pretendard first, system fallbacks after.
+     Applied site-wide via the `body` rule below; the concept/article reading
+     body opts into MaruBuri serif. */
+  --aas-sans: 'Pretendard', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 :root[data-theme="dark"] {
@@ -253,8 +313,9 @@ html {
   font-size: 1.35rem;
 }
 .aas-doc .prose :where(h1, h2, h3, h4, h5, h6),
+.aas-doc .prose :where(table),
 .aas-doc .prose a.aas-lift {
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--aas-sans);
 }
 .aas-doc .prose :where(code, pre, kbd, samp) {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -303,7 +364,7 @@ a.aas-anchor.copied::after {
 }
 
 body {
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--aas-sans);
 }
 
 /* Tailwind v4 no longer sets a pointer cursor on buttons; restore it (and for
