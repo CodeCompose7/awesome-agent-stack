@@ -943,3 +943,12 @@ summary {
 [data-prefilter] [data-section] {
   visibility: hidden;
 }
+
+/* Tab bar and the sample/project viewer are UI chrome (file tree, selectors,
+   buttons) — keep them gothic even when they sit inside the reading (serif)
+   column. Setting font-family directly on these elements overrides the serif
+   they'd otherwise inherit from the surrounding .aas-reading wrapper. */
+[role='tablist'],
+[data-projects] {
+  font-family: var(--aas-sans);
+}
