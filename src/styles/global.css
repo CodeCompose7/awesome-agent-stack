@@ -1,5 +1,39 @@
 @import "tailwindcss";
 
+/* MaruBuri (Naver) — a Korean serif that also covers Latin. Used for the
+   concept/article reading body (a Medium-style serif column). Remote woff2,
+   font-display: swap so text shows immediately in the fallback serif. */
+@font-face {
+  font-family: 'MaruBuri';
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-ExtraLight.woff2) format('woff2');
+  font-weight: 200;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MaruBuri';
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Light.woff2) format('woff2');
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MaruBuri';
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff2) format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MaruBuri';
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-SemiBold.woff2) format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MaruBuri';
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Bold.woff2) format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
 /* Light is the default; `data-theme="dark"` (set by the inline script in
    BaseLayout) switches to dark. The @media block covers no-JS users whose
    system prefers dark before any explicit choice is stored. */
@@ -199,6 +233,31 @@ html {
     width: 13rem;
     max-height: calc(100vh - 9rem);
   }
+}
+
+/* Medium-style reading body: a larger MaruBuri serif column for the concept /
+   article prose. Headings stay sans for contrast, inline tool cards stay sans,
+   and code stays monospace — only the running text becomes serif. */
+.aas-doc .prose {
+  font-family: 'MaruBuri', ui-serif, Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.85;
+}
+.aas-doc .prose :where(p, ul, ol, blockquote, td, th) {
+  line-height: 1.85;
+}
+.aas-doc .prose :where(h2) {
+  font-size: 1.7rem;
+}
+.aas-doc .prose :where(h3) {
+  font-size: 1.35rem;
+}
+.aas-doc .prose :where(h1, h2, h3, h4, h5, h6),
+.aas-doc .prose a.aas-lift {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.aas-doc .prose :where(code, pre, kbd, samp) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 /* "#" copy-link anchor prepended to headings (h2/h3). Faint by default, fully
