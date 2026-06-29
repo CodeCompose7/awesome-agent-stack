@@ -77,7 +77,12 @@ Each row is solved by a layer *outside* the model, not by a smarter one. Growing
 
 ### Silent wrong answers
 
-Instead of saying "I don't know," a model hands you a confident, plausible falsehood, and it slips by until a human checks each claim. **Evaluation** catches it; **tracing** records it. Evaluation doesn't take a claim at face value — it picks the check that fits: factual claims are scored against trusted sources or a reference, while code and API claims are run in a sandbox or statically checked. Tracing logs each step so you can trace back where it broke.
+Instead of saying "I don't know," a model hands you a confident, plausible falsehood, and it slips by until a human checks each claim. **Evaluation** catches it; **tracing** records it.
+
+- **Evaluation** — don't take a claim at face value; pick the check that fits
+  - Factual claims, scored against a trusted source or reference
+  - Code and API claims, run in a sandbox or statically checked
+- **Tracing** — every step logged, so you can trace back where it broke
 
 <details open>
 <summary>Concrete examples</summary>
