@@ -28,6 +28,23 @@ period; that trailing `).` is part of Markdown, not prose, and must stay:
 
 The rule is only about prose parentheses `( … )`, never about `](url)` / `](path)`.
 
+## Korean: parenthesize a mid-sentence aside, don't em-dash it
+
+When a noun (or a short noun list) is inserted *inside* a sentence that flows
+right past it — the next word is a particle like `으로`, `를`, `에서` — wrap the
+aside in parentheses. An em dash detaches the particle and reads awkwardly,
+because Korean glues the particle to the noun, not to a floating dash.
+
+- ❌ `LLM을 스캐폴딩 — 제어 루프·도구·샌드박스·가드레일·평가 — 으로 감싸 …` — `으로`
+  is stranded after the dash
+- ✅ `LLM을 스캐폴딩(제어 루프·도구·샌드박스·가드레일·평가)으로 감싸 …` — `)으로`
+  keeps the particle attached
+
+This stays consistent with the `).` rule above: the parenthesis is mid-sentence
+(`)으로` follows, not `).`), so it is fine. Em dashes are still the right tool
+for a *trailing* aside the sentence does **not** continue past (e.g. `… 한 겹씩
+더합니다 — 위험이 있는 곳에만`).
+
 ## Korean: no trailing period after a noun-ending fragment
 
 A list item, caption, or table cell that ends in a **noun / noun phrase** — a
