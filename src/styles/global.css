@@ -306,45 +306,45 @@ html {
    for contrast, inline tool cards stay sans, and code stays monospace — only
    the running text becomes serif. Concept/article/stack share the same width
    and the .aas-toc-rail TOC, so there is no separate doc layout. */
-.aas-reading {
+.aas-reading.aas-reading {
   font-family: 'MaruBuri', ui-serif, Georgia, serif;
   font-size: 1.2rem;
   line-height: 1.85;
 }
-.aas-reading :where(p, ul, ol, blockquote, td, th) {
+.aas-reading.aas-reading :where(p, ul, ol, blockquote, td, th) {
   line-height: 1.85;
 }
-.aas-reading :where(h2) {
+.aas-reading.aas-reading :where(h2) {
   font-size: 1.7rem;
 }
-.aas-reading :where(h3) {
+.aas-reading.aas-reading :where(h3) {
   font-size: 1.35rem;
 }
-.aas-reading :where(h1, h2, h3, h4, h5, h6),
-.aas-reading :where(table),
-.aas-reading a.aas-lift {
+.aas-reading.aas-reading :where(h1, h2, h3, h4, h5, h6),
+.aas-reading.aas-reading :where(table),
+.aas-reading.aas-reading a.aas-lift {
   font-family: var(--aas-sans);
 }
-.aas-reading :where(code, pre, kbd, samp) {
+.aas-reading.aas-reading :where(code, pre, kbd, samp) {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 /* Doc tables: a touch larger, centered (shrink-to-content), roomier cells, and
    a full-row hover highlight. `fit-content` + `margin-inline: auto` centers the
    table block while `max-width`/overflow (from the base .prose rule) keep it
    scrollable if it ever outgrows the column. */
-.aas-reading :where(table) {
+.aas-reading.aas-reading :where(table) {
   width: fit-content;
   max-width: 100%;
   margin-inline: auto;
   font-size: 1.05rem;
 }
-.aas-reading :where(th, td) {
+.aas-reading.aas-reading :where(th, td) {
   padding: 0.7rem 1.25rem;
 }
-.aas-reading :where(tbody tr) {
+.aas-reading.aas-reading :where(tbody tr) {
   transition: background-color 0.15s;
 }
-.aas-reading tbody tr:hover {
+.aas-reading.aas-reading tbody tr:hover {
   background: var(--aas-tint);
 }
 
