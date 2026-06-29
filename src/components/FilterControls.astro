@@ -187,6 +187,26 @@ const menuClass =
     const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-section]'));
     const noResults = document.querySelector<HTMLElement>('[data-no-results]')!;
     const FACETS = ['pricing', 'license', 'language'];
+
+    // Carry the live filter/sort state across catalog navigation: category links
+    // (and the breadcrumb) keep the current query string, so drilling into a
+    // category preserves the sort/filters. Each link's filter-free href is
+    // remembered once, then rewritten with the current `location.search`.
+    const keepLinks = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>(
+        '[data-keep-filters], nav[aria-label="Breadcrumb"] a',
+      ),
+    );
+    keepLinks.forEach((a) => {
+      if (a.dataset.baseHref === undefined) a.dataset.baseHref = a.getAttribute('href') ?? '';
+    });
+    function syncLinks() {
+      for (const a of keepLinks) {
+        const [pathQ, hash] = (a.dataset.baseHref ?? '').split('#');
+        const path = pathQ.split('?')[0];
+        a.setAttribute('href', path + location.search + (hash ? `#${hash}` : ''));
+      }
+    }
     let sort = 'alpha';
     let fresh = 0; // hide tools whose latest release is older than this many months (0 = off)
 
@@ -299,6 +319,7 @@ const menuClass =
       clearBtn.hidden = !anyFilter;
 
       if (write) writeUrl();
+      syncLinks();
     }
 
     input.addEventListener('input', () => apply());

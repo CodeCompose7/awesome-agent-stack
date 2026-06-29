@@ -125,7 +125,7 @@ const cardProps = (e: StackEntry) => ({
         <div data-section>
           <div class="pb-1">
             <h2 class="text-2xl font-semibold">
-              <a href={catUrl(g.cat.id)} class="text-[var(--aas-text)] no-underline hover:text-[var(--aas-accent)]">
+              <a href={catUrl(g.cat.id)} data-keep-filters class="text-[var(--aas-text)] no-underline hover:text-[var(--aas-accent)]">
                 {g.cat.label[lang]}
                 <span class="text-[var(--aas-muted)]"> &nearr;</span>
               </a>
