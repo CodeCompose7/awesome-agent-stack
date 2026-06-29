@@ -831,6 +831,25 @@ summary {
   margin: 1.75rem 0;
 }
 
+/* Collapsible <details> used in prose (e.g. "구체적인 예시" reveals). A soft
+   panel with a clickable summary; the disclosure marker stays. */
+.prose :where(details) {
+  margin: 0.9rem 0;
+  border: 1px solid var(--aas-border);
+  border-radius: 0.6rem;
+  background: var(--aas-panel);
+  padding: 0.1rem 0.95rem;
+}
+.prose :where(summary) {
+  cursor: pointer;
+  padding: 0.55rem 0;
+  font-weight: 600;
+  color: var(--aas-muted);
+}
+.prose :where(details[open]) {
+  padding-bottom: 0.55rem;
+}
+
 /* Card-style links rendered inside prose (e.g. a concept's inline <Tools/>
    cards) must not pick up the prose link underline on hover. */
 .prose a.aas-lift,

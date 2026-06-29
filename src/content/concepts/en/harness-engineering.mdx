@@ -67,33 +67,104 @@ Most of the demo-to-production gap is harness, not model. A demo only has to suc
 
 | Common failure | Fixed by |
 | --- | --- |
-| Silent wrong answers | Evaluation · tracing |
-| Runaway loops | A bounded agent loop |
-| Unsafe / off-topic output | Guardrails |
-| Risky side effects | A code sandbox |
-| "Worked yesterday" | Observability |
+| [Silent wrong answers](#silent-wrong-answers) | Evaluation · tracing |
+| [Runaway loops](#runaway-loops) | A bounded agent loop |
+| [Unsafe / off-topic output](#unsafe--off-topic-output) | Guardrails |
+| [Risky side effects](#risky-side-effects) | A code sandbox |
+| ["Worked yesterday"](#worked-yesterday) | Observability |
 
 Each row is solved by a layer *outside* the model, not by a smarter one. Growing the harness is how you grow reliability.
 
 ### Silent wrong answers
 
-Instead of saying "I don't know," a model hands you a confident, plausible falsehood. Uncited claims, invented numbers, and subtly wrong facts slip through unnoticed until a human checks each one. **Evaluation and tracing** close that gap — score outputs automatically on faithfulness and accuracy, and trace every step to find where it went wrong, so the pipeline catches regressions before your users do.
+Instead of saying "I don't know," a model hands you a confident, plausible falsehood — and it slips by until a human checks each claim.
+
+<details>
+<summary>Concrete examples</summary>
+
+- Invented citations and statistics, with no source
+- Subtly wrong dates and numbers
+- API or function names that don't exist
+
+</details>
+
+**Evaluation and tracing** close the gap.
+
+- Score outputs automatically on faithfulness and accuracy
+- Trace every step to find where it went wrong
+- Let the pipeline catch regressions before your users do
 
 ### Runaway loops
 
-Between calling a tool, reading the result, and calling again, an agent can circle the same spot or fall into retries that never end — burning cost and latency with no answer. **A bounded agent loop** caps steps, time, and cost, and is built to stop when there's no progress, containing the runaway structurally.
+Between calling a tool, reading the result, and calling again, an agent can circle the same spot or retry forever. **A bounded agent loop** caps steps, time, and cost, and stops when there's no progress.
+
+```mermaid
+flowchart LR
+  step["one action step"] --> check{"over a cap?"}
+  check -- no --> step
+  check -- yes --> stop["stop"]
+```
+
+<details>
+<summary>Concrete examples</summary>
+
+- An infinite loop repeating the same search
+- Endless retries of a failing tool call
+- Reasoning that circles without nearing an answer
+
+</details>
 
 ### Unsafe / off-topic output
 
-Sometimes an answer comes back, but it's unsafe or off-topic — leaked sensitive data, inappropriate language, a detour into things nobody asked about. **Guardrails** enforce an output schema and block unsafe or off-policy content at runtime, before it reaches a user — checked while the agent runs, not after the fact.
+Sometimes an answer comes back, but it's unsafe or off-topic. **Guardrails** check and block the output at runtime, before it reaches a user.
+
+```mermaid
+flowchart LR
+  out["model output"] --> guard{"guardrails"}
+  guard -- pass --> user["user"]
+  guard -- violation --> block["block / rewrite"]
+```
+
+<details>
+<summary>Concrete examples</summary>
+
+- Personal data or secret keys leaked verbatim
+- Profanity, hate, or other unsafe language
+- Drifting into a topic nobody asked about
+
+</details>
 
 ### Risky side effects
 
-An agent that runs code can delete files, fire off arbitrary network calls, or wreck its environment. **A code sandbox** runs model-written code in an isolated, disposable environment, so a bad command can't touch your machine or your data.
+An agent that runs code can delete files or fire off arbitrary network calls and wreck its environment. **A code sandbox** runs model-written code in an isolated, disposable environment.
+
+```mermaid
+flowchart LR
+  code["model-written code"] --> sandbox["code sandbox"]
+  sandbox -. isolates .- host["your machine · data"]
+```
+
+<details>
+<summary>Concrete examples</summary>
+
+- Accidentally deleting files or directories
+- Arbitrary outbound network requests
+- Corrupting system config or dependencies
+
+</details>
 
 ### "Worked yesterday"
 
-A small change to the model or the prompt, and quality quietly degrades or cost spikes. If you can't see what changed, you can't roll it back. **Observability** traces every step, token, and cost, surfacing regressions before your users hit them.
+A small change to the model or the prompt, and quality quietly degrades or cost spikes. **Observability** traces every step, token, and cost, surfacing regressions before your users hit them.
+
+<details>
+<summary>Concrete examples</summary>
+
+- A subtle accuracy drop after swapping models
+- More tokens and cost after a prompt edit
+- A flow broken by an external tool change
+
+</details>
 
 ## The roles — and the tools that fill them
 
