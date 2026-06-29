@@ -172,6 +172,37 @@ html {
   color: var(--aas-text);
 }
 
+/* Doc layout (concept / article pages): content and a sticky right-rail TOC laid
+   out as columns, centered together inside the page container. The rail appears
+   at ≥1200px — narrow enough for a typical laptop — and below that the content
+   simply spans the full width. Unlike StackDetail's `.aas-toc-rail` (fixed, out
+   of flow, needs the ~1536px margin), this keeps the rail beside the content so
+   it fits much sooner. */
+.aas-doc {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+.aas-doc-main {
+  min-width: 0; /* let the prose column shrink instead of overflowing */
+  flex: 1;
+}
+.aas-doc-rail {
+  display: none;
+}
+@media (min-width: 1200px) {
+  .aas-doc-rail {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 7rem;
+    align-self: flex-start;
+    width: 13rem;
+    flex-shrink: 0;
+    max-height: calc(100vh - 9rem);
+  }
+}
+
 /* "#" copy-link anchor prepended to headings (h2/h3). Faint by default, fully
    shown on hover/focus. `a.aas-anchor` outranks `.prose :where(a)` so it keeps
    no underline / muted color. Click copies the section URL (see BaseLayout). */

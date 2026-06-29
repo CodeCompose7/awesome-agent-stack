@@ -32,6 +32,8 @@ const referenced = data.tools
   .filter(Boolean) as NonNullable<ReturnType<typeof bySlug.get>>[];
 ---
 
+<div class="aas-doc">
+<div class="aas-doc-main">
 <a href={getRelativeLocaleUrl(lang, 'blog/')} class="text-sm text-[var(--aas-accent)] no-underline"
   >&larr; {t('article.backToBlog')}</a
 >
@@ -96,5 +98,7 @@ const referenced = data.tools
 <article class="prose mt-8 max-w-none">
   <Content />
 </article>
+</div>
 
 <TocRail lang={lang} items={tocItems} />
+</div>
