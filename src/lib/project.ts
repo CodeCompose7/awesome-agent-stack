@@ -84,15 +84,16 @@ function renderReadme(
   const headings: ProjectHeading[] = [];
   for (let i = 0; i < tokens.length; i++) {
     const tk = tokens[i];
-    if (tk.type === 'heading_open' && (tk.tag === 'h2' || tk.tag === 'h3')) {
+    if (tk.type === 'heading_open' && (tk.tag === 'h2' || tk.tag === 'h3' || tk.tag === 'h4')) {
       const text = tokens[i + 1]?.content ?? '';
       const slug = `${folder}-${slugify(text)}`;
       tk.attrSet('id', slug);
-      headings.push({ slug, text, depth: tk.tag === 'h2' ? 2 : 3 });
+      // Anchor every level up to h4; the TOC still lists h2/h3 only.
+      if (tk.tag !== 'h4') headings.push({ slug, text, depth: tk.tag === 'h2' ? 2 : 3 });
     }
   }
   const html = md.renderer.render(tokens, md.options, {}).replace(
-    /<(h[23]) id="([^"]+)">([\s\S]*?)<\/\1>/g,
+    /<(h[234]) id="([^"]+)">([\s\S]*?)<\/\1>/g,
     (_m, tag, id, inner) =>
       `<${tag} id="${id}">` +
       `<a class="aas-anchor" href="#${id}" aria-label="Copy link to section"></a>${inner}</${tag}>`,

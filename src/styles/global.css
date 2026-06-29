@@ -382,10 +382,17 @@ a.aas-anchor {
     opacity 0.15s,
     color 0.15s;
 }
-a.aas-anchor::before {
+/* The "#" count mirrors the heading depth: h2 → #, h3 → ##, h4 → ###. */
+:where(h2) > a.aas-anchor::before {
   content: '#';
 }
-:where(h2, h3):hover > a.aas-anchor,
+:where(h3) > a.aas-anchor::before {
+  content: '##';
+}
+:where(h4) > a.aas-anchor::before {
+  content: '###';
+}
+:where(h2, h3, h4):hover > a.aas-anchor,
 a.aas-anchor:hover,
 a.aas-anchor:focus {
   opacity: 1;

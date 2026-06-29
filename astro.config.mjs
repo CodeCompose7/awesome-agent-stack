@@ -7,8 +7,10 @@ import tailwindcss from '@tailwindcss/vite';
 import rehypeExternalLinks from 'rehype-external-links';
 import rehypeSlug from 'rehype-slug';
 
-// Prepend a "#" copy-link anchor to h2/h3 headings only (a global click handler
-// in BaseLayout copies the section URL). Runs after rehype-slug adds the ids.
+// Prepend a "#" copy-link anchor to h2/h3/h4 headings (a global click handler
+// in BaseLayout copies the section URL). The "#" count per level is drawn via
+// CSS (h2 → #, h3 → ##, h4 → ###). The TOC still lists h2/h3 only. Runs after
+// rehype-slug adds the ids.
 function rehypeHeadingAnchors() {
   /** @param {any} node */
   const walk = (node) => {
@@ -16,7 +18,7 @@ function rehypeHeadingAnchors() {
     for (const child of node.children) {
       if (
         child.type === 'element' &&
-        (child.tagName === 'h2' || child.tagName === 'h3') &&
+        (child.tagName === 'h2' || child.tagName === 'h3' || child.tagName === 'h4') &&
         child.properties &&
         child.properties.id
       ) {
