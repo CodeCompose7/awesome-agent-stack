@@ -23,7 +23,7 @@ as an example. A model's knowledge stops at its training cutoff, so a value
 that changes daily — like an exchange rate — is out of reach; a *web-search
 tool* is what bridges that gap. Here we turn that example into a working agent.
 
-## What we're building
+## What we're building \{#what-were-building}
 
 An agent that, given a question, decides on its own "I should search for this,"
 queries the web through Tavily, reads the fresh results, and answers with the
@@ -44,7 +44,7 @@ flowchart LR
 Without the tool the model can only guess at a stale value; with one tool, the
 answer is grounded in today's web.
 
-## Reading the code
+## Reading the code \{#reading-the-code}
 
 The whole flow in `app.py` splits into three functions — `main()` wires the
 model and the agent, `web_search()` is the tool the model calls, and
@@ -88,14 +88,14 @@ flowchart TB
 - When it finishes, the last message's `content` is cleaned by `message_text()` and printed
 - Whether to call the tool — and whether to call again — is entirely the loop's decision
 
-## The implementation
+## The implementation \{#the-implementation}
 
 A LangGraph ReAct loop with a single `web_search` tool. The model is routed
 through LiteLLM, so the same code runs on Claude, OpenAI, or Gemini.
 
 <SampleProject folder="tavily_1" />
 
-## The key parts
+## The key parts \{#the-key-parts}
 
 - **A tool is a function** — the whole tool is one `@tool`-wrapped
   `web_search(query)`. Its docstring is the model's manual, so the model reads

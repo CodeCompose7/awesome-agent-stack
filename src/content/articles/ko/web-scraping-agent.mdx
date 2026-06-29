@@ -22,7 +22,7 @@ import SampleProject from '../../../components/SampleProject.astro';
 페이지를 통째로 읽어 오는 일입니다. 이 글에서는 그 예시를 실제로 돌아가는 에이전트로
 만들어 봅니다.
 
-## 무엇을 만드나
+## 무엇을 만드나 \{#what-were-building}
 
 URL이 담긴 작업을 받으면 모델이 Firecrawl로 그 페이지를 마크다운으로 가져오고,
 내용을 읽어 요약·답변하는 에이전트입니다.
@@ -42,7 +42,7 @@ flowchart LR
 검색이 출처를 *가리키는* 데 그친다면, 스크래핑은 그 페이지의 본문 자체를 모델 앞에
 펼쳐 놓습니다.
 
-## 코드 뜯어보기
+## 코드 뜯어보기 \{#reading-the-code}
 
 `app.py`의 전체 흐름은 함수 셋으로 나뉩니다 — `main()`이 모델과 에이전트를 짜고,
 모델이 부르는 도구가 `scrape()`, 그리고 마지막 답을 다듬는 게 `message_text()`입니다.
@@ -84,14 +84,14 @@ flowchart TB
 - `agent.invoke({"messages": […]})`가 추론→도구 호출→관찰을 돌림
 - 끝나면 마지막 메시지의 `content`를 `message_text()`로 다듬어 출력
 
-## 구현
+## 구현 \{#the-implementation}
 
 LangGraph의 ReAct 루프에 `scrape` 도구 하나만 붙였습니다. 모델은 LiteLLM을 통해
 라우팅되므로 같은 코드가 Claude·OpenAI·Gemini에서 모두 동작합니다.
 
 <SampleProject folder="firecrawl_1" />
 
-## 핵심만 짚으면
+## 핵심만 짚으면 \{#the-key-parts}
 
 - **도구는 함수다** — `@tool`로 감싼 `scrape(url)` 하나가 페이지를 읽는 전부입니다.
 - **검색과 스크래핑은 다르다** — 검색은 *어디를* 볼지 찾고, 스크래핑은 *그 페이지를* 읽어 옵니다.

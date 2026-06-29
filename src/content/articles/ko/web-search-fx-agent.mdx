@@ -22,7 +22,7 @@ import SampleProject from '../../../components/SampleProject.astro';
 메우는 게 *웹 검색 도구*입니다. 이 글에서는 그 예시를 실제로 돌아가는 에이전트로
 만들어 봅니다.
 
-## 무엇을 만드나
+## 무엇을 만드나 \{#what-were-building}
 
 질문을 받으면 모델이 스스로 "이건 검색해야겠다"고 판단해 Tavily로 웹을 검색하고,
 최신 결과를 읽어 환율과 출처를 함께 답하는 에이전트입니다.
@@ -42,7 +42,7 @@ flowchart LR
 도구가 없으면 모델은 낡은 값을 추측할 뿐이지만, 도구 하나로 답이 오늘의 웹에
 근거하게 됩니다.
 
-## 코드 뜯어보기
+## 코드 뜯어보기 \{#reading-the-code}
 
 `app.py`의 전체 흐름은 함수 셋으로 나뉩니다 — `main()`이 모델과 에이전트를 짜고,
 모델이 부르는 도구가 `web_search()`, 그리고 마지막 답을 다듬는 게
@@ -86,14 +86,14 @@ flowchart TB
 - 끝나면 마지막 메시지의 `content`를 `message_text()`로 다듬어 출력
 - 도구를 부를지·한 번 더 부를지는 전부 루프가 결정
 
-## 구현
+## 구현 \{#the-implementation}
 
 LangGraph의 ReAct 루프에 `web_search` 도구 하나만 붙였습니다. 모델은 LiteLLM을
 통해 라우팅되므로 같은 코드가 Claude·OpenAI·Gemini에서 모두 동작합니다.
 
 <SampleProject folder="tavily_1" />
 
-## 핵심만 짚으면
+## 핵심만 짚으면 \{#the-key-parts}
 
 - **도구는 함수다** — `@tool`로 감싼 `web_search(query)` 하나가 전부입니다. docstring이
   곧 모델용 설명서라, 모델은 이걸 보고 "언제 검색할지"를 판단합니다.

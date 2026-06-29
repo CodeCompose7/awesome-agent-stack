@@ -14,7 +14,7 @@ cost. Two tools dominate that space for AI agents:
 [Langfuse](../../stack/langfuse/) and [LangSmith](../../stack/langsmith/).
 They overlap a lot, so the decision usually comes down to a few axes.
 
-## At a glance
+## At a glance \{#at-a-glance}
 
 | | Langfuse | LangSmith |
 | --- | --- | --- |
@@ -24,7 +24,7 @@ They overlap a lot, so the decision usually comes down to a few axes.
 | **Core** | Tracing, evals, prompt mgmt, analytics | Tracing, evals, prompt mgmt, monitoring |
 | **Pricing** | Open source + free cloud tier | Freemium (free tier + paid) |
 
-## Where Langfuse shines
+## Where Langfuse shines \{#where-langfuse-shines}
 
 [Langfuse](../../stack/langfuse/) is open source, so you can **self-host** and
 keep prompts and user data inside your own infrastructure — often the deciding
@@ -32,14 +32,14 @@ factor in regulated or privacy-sensitive settings. It's deliberately
 framework-agnostic: the SDK and OpenTelemetry support drop into any stack,
 whether or not you use LangChain.
 
-## Where LangSmith shines
+## Where LangSmith shines \{#where-langsmith-shines}
 
 [LangSmith](../../stack/langsmith/) is the most frictionless option if you're
 already building on LangChain or LangGraph — tracing lights up with almost no
 wiring. As a managed product it leans into a polished, batteries-included
 experience for datasets, evaluations, and production monitoring.
 
-## How to choose
+## How to choose \{#how-to-choose}
 
 - **Want to self-host or stay framework-agnostic?** → Langfuse.
 - **Already on LangChain/LangGraph and want zero-setup tracing?** → LangSmith.

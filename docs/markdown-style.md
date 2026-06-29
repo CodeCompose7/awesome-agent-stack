@@ -118,6 +118,21 @@ parenthetical or particle outside it.
 - ❌ `**function calling(도구 호출)**입니다` — renders a literal `**`
 - ✅ `**function calling**(도구 호출)입니다`
 
+## Heading anchors: give each heading an explicit English id
+
+Headings in concept/article MDX carry a stable, language-independent id so the
+**same** anchor works on the `en` and `ko` versions of a page, and so an external
+link to a section survives the heading wording changing. Write it as a trailing
+`{#id}` — and because MDX parses `{…}` as an expression, **escape the opening
+brace**: `\{#id}`.
+
+- ✅ `## 무엇인가 \{#what-it-is}` / `## What it is \{#what-it-is}` — same id both locales
+- The id (lowercase, hyphenated, English) is stripped from the visible heading
+  and used verbatim; a remark plugin sets it and rehype-slug won't override it.
+- In-page anchor links then target that id: `[웹 검색](#web-search)`.
+- A heading with no `\{#id}` falls back to an auto-slug of its text (unstable,
+  per-locale) — so add the id when authoring.
+
 ## General
 
 - Tag every fenced code block with its language (` ```bash `, ` ```python `,

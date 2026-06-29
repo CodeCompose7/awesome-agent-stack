@@ -20,7 +20,7 @@ order: 2
 import Tools from '../../../components/ConceptTools.astro';
 import ArticleLink from '../../../components/ArticleLink.astro';
 
-## What it is
+## What it is \{#what-it-is}
 
 A tool is a function that connects a model to the outside world. On its own a model only generates text; searching, reading a page, or booking a slot all happen only through a tool.
 
@@ -38,29 +38,29 @@ flowchart LR
   class result roleSource
 ```
 
-## Why it matters
+## Why it matters \{#why-it-matters}
 
 A model's knowledge stops at its training cutoff, and a model can't *do* anything on its own. Tools bridge both gaps — pulling in current data and carrying out real actions.
 
 | Without tools | What a tool bridges |
 | --- | --- |
 | **Stale knowledge** — nothing past the training cutoff | [Web search](#web-search) to look up current facts and prices |
-| **Unreadable pages** — no idea what's behind a link | [Scraping & crawling](#scraping--crawling) to pull the page content |
+| **Unreadable pages** — no idea what's behind a link | [Scraping & crawling](#scraping-crawling) to pull the page content |
 | **Unclickable UIs** — can't touch a screen with no API | [Browser automation](#browser-automation) to operate it like a person |
-| **Out-of-reach apps** — no access to mail, calendar, SaaS | [App & API integration](#app--api-integration) to delegate auth and calls |
+| **Out-of-reach apps** — no access to mail, calendar, SaaS | [App & API integration](#app-api-integration) to delegate auth and calls |
 | **Unrunnable code** — no exact computation or verification | [Code execution](#code-execution) to run it in a sandbox |
 
 Each row is solved by a line *out* to the world, not by a smarter model — which tool fills each spot is covered below.
 
-## The kinds — and the tools that fill them
+## The kinds — and the tools that fill them \{#the-kinds-and-the-tools-that-fill-them}
 
 Tools divide by what they connect to. Below are the common kinds and the catalog tools that fill each spot.
 
-### Web search
+### Web search \{#web-search}
 
 Finds web results for a question and returns them as usable excerpts and citations, not just links. Current facts and prices the model doesn't know go straight into its reasoning.
 
-#### Example. Asking today's FX rate
+#### Example. Asking today's FX rate \{#example-asking-todays-fx-rate}
 
 Anything the model's training doesn't have comes in through a search.
 
@@ -84,11 +84,11 @@ flowchart LR
 
 <Tools slugs={["tavily", "exa"]} />
 
-### Scraping & crawling
+### Scraping & crawling \{#scraping-crawling}
 
 Pulls a whole page or site and converts it into a format the model can read directly (Markdown and the like). If search finds *where* to look, scraping *reads that page in*.
 
-#### Example. A docs page as Markdown
+#### Example. A docs page as Markdown \{#example-a-docs-page-as-markdown}
 
 Turns a found page's content into something the model can read.
 
@@ -110,11 +110,11 @@ flowchart LR
 
 <Tools slugs={["firecrawl"]} />
 
-### Browser automation
+### Browser automation \{#browser-automation}
 
 Operates a screen with no API by clicking, typing, and navigating like a person. It handles work search and scraping can't reach — pages behind a login, form submissions.
 
-#### Example. Submitting a form behind a login
+#### Example. Submitting a form behind a login \{#example-submitting-a-form-behind-a-login}
 
 Looks at the screen, decides the next action, and drives an API-less web app.
 
@@ -134,11 +134,11 @@ flowchart LR
 
 <Tools slugs={["browser-use", "stagehand"]} />
 
-### App & API integration
+### App & API integration \{#app-api-integration}
 
 Exposes external apps — mail, calendar, SaaS — as tools through a layer that handles auth and calls for you. Instead of wiring up OAuth and APIs for hundreds of apps by hand, an integration layer offers them as a standardized set of tools.
 
-#### Example. Adding a calendar event
+#### Example. Adding a calendar event \{#example-adding-a-calendar-event}
 
 Calls many apps as tools from behind one integration layer.
 
@@ -160,11 +160,11 @@ flowchart LR
 
 <Tools slugs={["composio"]} />
 
-### Code execution
+### Code execution \{#code-execution}
 
 Runs model-written code in an isolated environment for exact computation, data processing, and verification. This isolated run is the same tool as the code sandbox role in *harness engineering* — it contains side effects while also confirming the code actually works.
 
-#### Example. Computing with code
+#### Example. Computing with code \{#example-computing-with-code}
 
 Runs the model's code in a sandbox and takes back the result.
 
@@ -184,7 +184,7 @@ flowchart LR
 
 <Tools slugs={["e2b"]} />
 
-## How tool calling works
+## How tool calling works \{#how-tool-calling-works}
 
 To call a tool reliably, the model has to be told *what* it can call and *in what shape*.
 
@@ -194,7 +194,7 @@ To call a tool reliably, the model has to be told *what* it can call and *in wha
 
 Passing tool specs over a standard protocol is taking hold too — **MCP (Model Context Protocol)** is one example, standardizing how tools and data sources attach to a model.
 
-## Principles to keep in mind
+## Principles to keep in mind \{#principles-to-keep-in-mind}
 
 - **Start with few tools** — the more tools there are, the more room a model has to pick wrong, so expose only what's needed.
 - **The schema is the manual** — a tool's name and description are the model's instructions; vague ones invite misuse.

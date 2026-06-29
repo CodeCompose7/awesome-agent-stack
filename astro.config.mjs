@@ -42,6 +42,34 @@ function rehypeHeadingAnchors() {
   return (/** @type {any} */ tree) => walk(tree);
 }
 
+// Support explicit, stable heading ids written as `## Heading {#custom-id}`. The
+// id is stripped from the visible text and set on the heading, so rehype-slug
+// won't override it. Lets every locale share one anchor and keeps the anchor (and
+// any external link to it) stable even when the heading wording changes.
+function remarkHeadingIds() {
+  const re = /\s*\{#([\w-]+)\}\s*$/;
+  /** @param {any} node */
+  const walk = (node) => {
+    if (!node.children) return;
+    for (const child of node.children) {
+      if (child.type === 'heading' && child.children.length) {
+        const last = child.children[child.children.length - 1];
+        if (last && last.type === 'text') {
+          const m = last.value.match(re);
+          if (m) {
+            last.value = last.value.replace(re, '');
+            child.data = child.data || {};
+            child.data.hProperties = { ...(child.data.hProperties || {}), id: m[1] };
+          }
+        }
+      } else {
+        walk(child);
+      }
+    }
+  };
+  return (/** @type {any} */ tree) => walk(tree);
+}
+
 // Turn ```mermaid fenced blocks into <pre class="mermaid"> (raw, un-highlighted)
 // so the client-side mermaid loader can render them. Runs at the remark stage,
 // before syntax highlighting, so Shiki leaves these blocks alone.
@@ -85,7 +113,7 @@ export default defineConfig({
   // Open external links in Markdown/MDX bodies in a new tab. Internal links
   // (no protocol) are left alone, so in-site navigation stays in the same tab.
   markdown: {
-    remarkPlugins: [remarkMermaid],
+    remarkPlugins: [remarkHeadingIds, remarkMermaid],
     rehypePlugins: [
       rehypeSlug,
       rehypeHeadingAnchors,

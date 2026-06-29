@@ -22,7 +22,7 @@ The [Tools](../../concept/agent-tools/) concept's *scraping & crawling* uses
 scraping reads that whole page in. Here we turn that example into a working
 agent.
 
-## What we're building
+## What we're building \{#what-were-building}
 
 An agent that, given a task with a URL, fetches the page as Markdown through
 Firecrawl, reads it, and answers or summarizes.
@@ -42,7 +42,7 @@ flowchart LR
 Where search only *points* at a source, scraping lays the page's actual body
 out in front of the model.
 
-## Reading the code
+## Reading the code \{#reading-the-code}
 
 The whole flow in `app.py` splits into three functions — `main()` wires the
 model and the agent, `scrape()` is the tool the model calls, and
@@ -85,14 +85,14 @@ flowchart TB
 - `agent.invoke({"messages": […]})` runs reason→call-tool→observe
 - When it finishes, the last message's `content` is cleaned by `message_text()` and printed
 
-## The implementation
+## The implementation \{#the-implementation}
 
 A LangGraph ReAct loop with a single `scrape` tool. The model is routed through
 LiteLLM, so the same code runs on Claude, OpenAI, or Gemini.
 
 <SampleProject folder="firecrawl_1" />
 
-## The key parts
+## The key parts \{#the-key-parts}
 
 - **A tool is a function** — one `@tool`-wrapped `scrape(url)` is all it takes to read a page.
 - **Search and scraping differ** — search finds *where* to look; scraping reads *that page* in.
