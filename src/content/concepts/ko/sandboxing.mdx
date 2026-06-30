@@ -15,7 +15,6 @@ tags: [sandbox, isolation, security, containers, code-execution]
 order: 3
 ---
 
-import ConceptLink from "../../../components/ConceptLink.astro";
 import Tools from "../../../components/ConceptTools.astro";
 
 ## 무엇인가 \{#what-it-is}
@@ -33,7 +32,7 @@ flowchart LR
   class out roleSource
 ```
 
-이것은 <ConceptLink slug="harness-engineering" />의 *코드 샌드박스* 역할을 한 겹 더 깊이 들여다본 개념입니다. 하네스가 모델 둘레에 두르는 여러 장치 중, "실행을 가둔다"는 한 축을 다룹니다.
+이것은 [하네스 엔지니어링](../harness-engineering/)의 *코드 샌드박스* 역할을 한 겹 더 깊이 들여다본 개념입니다. 하네스가 모델 둘레에 두르는 여러 장치 중, "실행을 가둔다"는 한 축을 다룹니다.
 
 ## 왜 중요한가 \{#why-it-matters}
 
@@ -90,7 +89,7 @@ flowchart TB
 
 샌드박싱은 코드 실행 한 곳에만 있지 않습니다. 에이전트가 바깥과 닿는 거의 모든 지점에 같은 격리가 필요합니다.
 
-- **코드 실행 도구** — 모델이 짠 코드를 돌려 계산·검증. <ConceptLink slug="agent-tools" />의 *코드 실행*과 같은 도구로, 부작용을 막으면서 코드가 실제로 도는지도 확인
+- **코드 실행 도구** — 모델이 짠 코드를 돌려 계산·검증. [도구](../agent-tools/) 개념의 *코드 실행*과 같은 도구로, 부작용을 막으면서 코드가 실제로 도는지도 확인
 - **컴퓨터·브라우저 사용** — 화면을 직접 조작하는 에이전트를 격리된 VM 안에서 돌림
 - **도구·MCP 서버 격리** — 서드파티 도구와 MCP 서버를 분리 실행해, 한 도구의 사고가 전체로 번지지 않게 함
 - **에이전트 런타임** — 에이전트 자체를 컨테이너로 묶어 배포하고, 인스턴스마다 경계를 둠
