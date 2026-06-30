@@ -260,9 +260,7 @@ const relatedToolsByFolder = new Map(projectRail.map((p) => [p.folder, p.tools])
   }
 </header>
 
-<RelatedTools lang={lang} slugs={data.related} />
-
-{/* Concepts that use this tool (computed backlink), as cards under related tools. */}
+{/* Concepts that use this tool (computed backlink), shown above related tools. */}
 {
   relatedConcepts.length > 0 && (
     <section class="mt-8">
@@ -303,6 +301,8 @@ const relatedToolsByFolder = new Map(projectRail.map((p) => [p.folder, p.tools])
     </section>
   )
 }
+
+<RelatedTools lang={lang} slugs={data.related} />
 
 {/* Content + a sticky right-rail TOC, side by side in one centered column. */}
 <div class="mt-8 flex items-start gap-8">
