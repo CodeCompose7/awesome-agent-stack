@@ -25,6 +25,8 @@ const dateStr = date.toISOString().slice(0, 10);
 
 <a
   href={href}
+  data-name={title.toLowerCase()}
+  data-date={date.toISOString()}
   class="aas-lift block overflow-hidden rounded-3xl border border-[var(--aas-border)] bg-[var(--aas-panel)] no-underline"
 >
   {image && <Image src={image} alt={imageAlt ?? title} class="aspect-[16/9] w-full object-cover" />}

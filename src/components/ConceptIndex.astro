@@ -2,6 +2,7 @@
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import ConceptCard from './ConceptCard.astro';
 import Breadcrumb from './Breadcrumb.astro';
+import SortToggle from './SortToggle.astro';
 import { conceptTree } from '../data/concept-categories';
 import { getConcepts, conceptSlugOf, type ConceptEntry } from '../lib/concepts';
 import { useTranslations, type Lang } from '../i18n/ui';
@@ -73,9 +74,11 @@ const card = (c: ConceptEntry) => ({
 
 {all.length === 0 && <p class="mt-8 text-[var(--aas-muted)]">{t('concept.empty')}</p>}
 
+{all.length > 0 && <div class="mt-6"><SortToggle lang={lang} curatedLabel={t('sort.curated')} /></div>}
+
 {
   direct.length > 0 && (
-    <div class="mt-6 grid gap-5 sm:grid-cols-2">
+    <div class="mt-4 grid gap-5 sm:grid-cols-2" data-sortgrid>
       {direct.map((c) => (
         <ConceptCard {...card(c)} />
       ))}
@@ -99,7 +102,7 @@ const card = (c: ConceptEntry) => ({
             </a>
           </h2>
           <p class="mt-1 text-sm text-[var(--aas-muted)]">{cat.description[lang]}</p>
-          <div class="mt-4 grid gap-5 sm:grid-cols-2">
+          <div class="mt-4 grid gap-5 sm:grid-cols-2" data-sortgrid>
             {items.map((c) => (
               <ConceptCard {...card(c)} />
             ))}
