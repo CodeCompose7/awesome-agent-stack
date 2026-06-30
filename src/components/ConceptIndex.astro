@@ -93,7 +93,7 @@ const card = (c: ConceptEntry) => ({
 {
   direct.length > 0 && (
     <div
-      class="mt-4 grid gap-5 sm:grid-cols-2"
+      class="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
       data-sortgrid
       data-paginate={isLeaf ? true : undefined}
       data-page-size={isLeaf ? PAGE : undefined}
@@ -121,7 +121,7 @@ const card = (c: ConceptEntry) => ({
             </a>
           </h2>
           <p class="mt-1 text-sm text-[var(--aas-muted)]">{cat.description[lang]}</p>
-          <div class="mt-4 grid gap-5 sm:grid-cols-2" data-sortgrid>
+          <div class="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-sortgrid>
             {items.slice(0, PAGE).map((c) => (
               <ConceptCard {...card(c)} />
             ))}
