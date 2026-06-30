@@ -1,0 +1,40 @@
+---
+name: Daytona
+vendor: "Daytona"
+category: tool-sandbox
+docVersion: "1.0"
+updated: 2026-06-30
+description: Secure, elastic infrastructure for running AI-generated code in fast, fully isolated sandboxes
+website: https://www.daytona.io
+repo: https://github.com/daytonaio/daytona
+docs: https://www.daytona.io/docs
+tags: [sandbox, runtime, code-execution, isolation, agent]
+language: Go
+license: AGPL-3.0
+pricing: [open-source, free-tier, paid]
+related: [e2b, modal]
+---
+
+## Overview
+
+Daytona is infrastructure purpose-built for running AI-generated code. Each
+sandbox is a fully isolated environment — its own kernel, filesystem, and
+network stack — that boots in well under a second, so an agent can create one
+per task, run code, and discard it.
+
+```mermaid
+flowchart LR
+  code[LLM code] --> daytona[Daytona Sandbox]
+  daytona --> exec[(isolated env)]
+  daytona --> out[stdout / results]
+```
+
+It exposes Python and TypeScript SDKs for spinning sandboxes up and down, with
+state and filesystem access inside. The core is open (AGPL-3.0) and there's a
+hosted offering for teams that don't want to run it themselves.
+
+## When to use it
+
+Choose Daytona when an agent runs many short-lived, untrusted code executions
+and you want strong per-task isolation with sub-second startup — a code
+interpreter, a data-analysis step, or an autonomous coding agent's workspace.

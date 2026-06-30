@@ -7,7 +7,8 @@ description: |-
 version: "1.0"
 updated: 2026-06-30
 tools:
-  - { role: "Managed sandboxes", tools: [e2b] }
+  - { role: "Managed sandboxes", tools: [e2b, modal, daytona] }
+  - { role: "Containers & runtimes", tools: [docker] }
 related: [harness-engineering, agent-tools]
 category: concept-architecture
 tags: [sandbox, isolation, security, containers, code-execution]
@@ -83,7 +84,7 @@ The same goal, reached by approaches that trade isolation strength against opera
 
 Containers share the host kernel, so isolation is medium — but they're light and run anywhere, enough for most code execution. To run many lower-trust workloads, *microVMs* (Firecracker) or *sandbox kernels* (gVisor) split off the kernel too and raise the bar. To shed the burden of running any of it yourself, *managed sandboxes* hide all of the above behind one API call — the agent spins up a fresh environment on demand and discards it when done.
 
-<Tools slugs={["e2b"]} />
+<Tools slugs={["e2b", "modal", "daytona", "docker"]} />
 
 ## Where it shows up in agents \{#where-it-shows-up}
 

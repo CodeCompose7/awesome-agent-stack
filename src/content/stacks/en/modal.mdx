@@ -1,0 +1,41 @@
+---
+name: Modal
+vendor: "Modal Labs"
+category: tool-sandbox
+docVersion: "1.0"
+updated: 2026-06-30
+description: Serverless cloud runtime whose Sandboxes run untrusted, model-generated code in isolated containers on demand
+website: https://modal.com
+repo: https://github.com/modal-labs/modal-client
+docs: https://modal.com/docs
+tags: [sandbox, runtime, serverless, code-execution, python]
+language: Python
+license: Apache-2.0
+pricing: [free-tier, paid]
+related: [e2b, daytona]
+---
+
+## Overview
+
+Modal is a serverless platform for running code in the cloud without managing
+servers. For agents, **Modal Sandboxes** spin up an isolated container on
+demand, run arbitrary model-generated code inside it, and stream back the
+output — the host is never exposed.
+
+```mermaid
+flowchart LR
+  code[LLM code] --> modal[Modal Sandbox]
+  modal --> exec[(isolated container)]
+  modal --> out[stdout / results]
+```
+
+You define the environment in Python (image, resources, timeout); Modal
+schedules it on its infrastructure and bills per second of compute. The SDK is
+open (Apache-2.0); the hosted runtime is the paid service.
+
+## When to use it
+
+Reach for Modal when an agent needs to execute untrusted code, but you also want
+the same primitive to scale to heavier jobs — GPU workloads, batch runs, or
+hosting a tool as a serverless function — behind one Python SDK, without
+operating sandboxes yourself.

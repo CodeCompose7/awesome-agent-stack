@@ -6,7 +6,8 @@ description: |-
 version: "1.0"
 updated: 2026-06-30
 tools:
-  - { role: "관리형 샌드박스", tools: [e2b] }
+  - { role: "관리형 샌드박스", tools: [e2b, modal, daytona] }
+  - { role: "컨테이너·런타임", tools: [docker] }
 related: [harness-engineering, agent-tools]
 category: concept-architecture
 tags: [sandbox, isolation, security, containers, code-execution]
@@ -82,7 +83,7 @@ flowchart TB
 
 컨테이너는 커널을 호스트와 공유하므로 격리가 중간 수준이지만, 가볍고 어디서나 돌아가 대부분의 코드 실행에는 충분합니다. 더 낮은 신뢰의 코드를 여럿 돌려야 하면 *마이크로VM*(Firecracker)이나 *샌드박스 커널*(gVisor)로 커널까지 갈라 격리를 끌어올립니다. 직접 운영하는 부담을 지우고 싶다면 *관리형 샌드박스*가 이 모든 걸 API 한 줄 뒤로 숨겨, 에이전트가 호출 한 번으로 새 환경을 띄우고 끝나면 버립니다.
 
-<Tools slugs={["e2b"]} />
+<Tools slugs={["e2b", "modal", "daytona", "docker"]} />
 
 ## 에이전트에서 어디에 나타나나 \{#where-it-shows-up}
 

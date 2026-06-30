@@ -308,14 +308,14 @@ export const categories: Category[] = [
       },
       {
         id: 'tool-sandbox',
-        label: { en: 'Code Sandboxes', ko: '코드 샌드박스' },
+        label: { en: 'Sandboxes & Runtimes', ko: '샌드박스·런타임' },
         description: {
-          en: 'Run agent-generated code safely in isolated environments.',
-          ko: '에이전트가 생성한 코드를 격리 환경에서 안전하게 실행하는 도구',
+          en: 'Run agent-generated code safely in isolated environments and runtimes.',
+          ko: '에이전트가 생성한 코드를 격리된 환경·런타임에서 안전하게 실행하는 도구',
         },
         detail: {
-          en: 'Execute model-written code without risking your machine. Isolated, disposable runtimes spin up fast, run the code, and tear down — the safe hands behind a code-interpreter agent.',
-          ko: '모델이 작성한 코드를 내 머신을 위협하지 않고 실행합니다. 격리된 일회용 런타임이 빠르게 떠서 코드를 돌리고 사라집니다 — 코드 인터프리터 에이전트 뒤의 안전장치입니다.',
+          en: 'Execute model-written code without risking your machine. Isolated, disposable runtimes — managed sandboxes, containers, microVMs — spin up fast, run the code, and tear down. The safe hands behind a code-interpreter agent.',
+          ko: '모델이 작성한 코드를 내 머신을 위협하지 않고 실행합니다. 관리형 샌드박스·컨테이너·마이크로VM 같은 격리된 일회용 런타임이 빠르게 떠서 코드를 돌리고 사라집니다 — 코드 인터프리터 에이전트 뒤의 안전장치입니다.',
         },
       },
       {
