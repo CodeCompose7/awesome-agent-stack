@@ -8,10 +8,15 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# The Docker CLI client — the agent calls it to spawn sandbox containers.
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends docker.io \
-    && rm -rf /var/lib/apt/lists/*
+# The Docker CLI *client* — the agent calls it to spawn sandbox containers on the
+# mounted host daemon. Debian's `docker.io` package isn't on every base (e.g.
+# trixie), so download just the static client binary with Python + tar (both
+# already in the image) — no apt, base-independent. `docker --version` fails the
+# build if it didn't land.
+RUN python -c "import platform, urllib.request; urllib.request.urlretrieve('https://download.docker.com/linux/static/stable/' + platform.machine() + '/docker-27.5.1.tgz', '/tmp/docker.tgz')" \
+    && tar -xzf /tmp/docker.tgz -C /usr/local/bin --strip-components=1 docker/docker \
+    && rm /tmp/docker.tgz \
+    && docker --version
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
