@@ -3,6 +3,7 @@ import { getRelativeLocaleUrl } from 'astro:i18n';
 import StackCard from './StackCard.astro';
 import Breadcrumb from './Breadcrumb.astro';
 import FilterControls from './FilterControls.astro';
+import ArrowUpRight from './ArrowUpRight.astro';
 import { categoryMap, childrenOf, pathOf } from '../data/categories';
 import { getStacks, getStacksByCategory, slugOf, type StackEntry } from '../lib/stacks';
 import { pricingTags } from '../lib/pricing';
@@ -129,7 +130,7 @@ const cardProps = (e: StackEntry) => ({
             <h2 class="text-2xl font-semibold">
               <a href={catUrl(g.cat.id)} data-keep-filters class="text-[var(--aas-text)] no-underline hover:text-[var(--aas-accent)]">
                 {g.cat.label[lang]}
-                <span class="text-[var(--aas-muted)]"> &nearr;</span>
+                <ArrowUpRight size={20} class="ml-1 text-[var(--aas-muted)]" />
               </a>
             </h2>
             <p class="mt-1 text-sm text-[var(--aas-muted)]">{g.cat.description[lang]}</p>

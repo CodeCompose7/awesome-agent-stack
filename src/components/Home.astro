@@ -2,6 +2,7 @@
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import StackCard from './StackCard.astro';
 import FilterControls from './FilterControls.astro';
+import ArrowUpRight from './ArrowUpRight.astro';
 import { rootCategories, descendantIds } from '../data/categories';
 import { getStacks, slugOf } from '../lib/stacks';
 import { pricingTags } from '../lib/pricing';
@@ -85,7 +86,7 @@ const facets = [
                 class="text-[var(--aas-text)] no-underline hover:text-[var(--aas-accent)]"
               >
                 {cat.label[lang]}
-                <span class="text-[var(--aas-muted)]"> &nearr;</span>
+                <ArrowUpRight size={20} class="ml-1 text-[var(--aas-muted)]" />
               </a>
             </h2>
             <p class="mt-1 text-sm text-[var(--aas-muted)]">{cat.description[lang]}</p>
