@@ -232,6 +232,18 @@ html {
   }
 }
 
+/* Floating "back to top" button: only below the TOC-rail breakpoint (the rail
+   handles navigation on wide screens), and only once scrolled down a bit
+   (`data-visible`, toggled in BackToTop.astro). */
+.aas-totop {
+  display: none;
+}
+@media (max-width: 1199.98px) {
+  .aas-totop[data-visible] {
+    display: flex;
+  }
+}
+
 /* Right-rail TOC: an in-flow sticky column beside the content, shown once the
    viewport is wide enough to hold both (≥1200px). Below that it hides and the
    content spans the full column. A flex column so a long TOC scrolls internally
