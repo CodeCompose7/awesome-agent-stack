@@ -20,7 +20,13 @@ interface Props {
 
 const { lang, categoryId } = Astro.props;
 const t = useTranslations(lang);
-const all = await getConcepts(lang);
+// Default order is most-recently-updated first (matches the ListControls
+// default), so the server render and the client sort agree — no reflow on load.
+const all = (await getConcepts(lang)).sort(
+  (a, b) =>
+    (b.data.updated?.getTime() ?? 0) - (a.data.updated?.getTime() ?? 0) ||
+    a.data.title.localeCompare(b.data.title),
+);
 const catUrl = (cid: string) => getRelativeLocaleUrl(lang, `concept/category/${cid}/`);
 
 const itemsIn = (cid: string): ConceptEntry[] => {
@@ -82,7 +88,7 @@ const card = (c: ConceptEntry) => ({
 
 {all.length === 0 && <p class="mt-8 text-[var(--aas-muted)]">{t('concept.empty')}</p>}
 
-{all.length > 0 && <div class="mt-6"><ListControls lang={lang} curatedLabel={t('sort.curated')} /></div>}
+{all.length > 0 && <div class="mt-6"><ListControls lang={lang} /></div>}
 
 {
   direct.length > 0 && (
