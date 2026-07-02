@@ -346,7 +346,8 @@ html {
 }
 .aas-reading.aas-reading :where(h1, h2, h3, h4, h5, h6),
 .aas-reading.aas-reading :where(table),
-.aas-reading.aas-reading a.aas-lift {
+.aas-reading.aas-reading a.aas-lift,
+.aas-reading.aas-reading .aas-sample-picker {
   font-family: var(--aas-sans);
 }
 .aas-reading.aas-reading :where(code, pre, kbd, samp) {
