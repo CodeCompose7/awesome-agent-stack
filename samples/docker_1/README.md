@@ -28,7 +28,7 @@ cp .env.sample .env
 `.env` is gitignored — only `.env.sample` is committed. No sandbox API key: the
 tool is local Docker.
 
-## Run
+## Run with Docker
 
 You need Docker available. Pre-pull the sandbox image once:
 
@@ -36,15 +36,8 @@ You need Docker available. Pre-pull the sandbox image once:
 docker pull python:3.12-slim
 ```
 
-**On the host** (simplest — the agent shells out to your Docker):
-
-```bash
-pip install -r requirements.txt
-python app.py "What is the 30th Fibonacci number? Use code."
-```
-
-**Or run the agent itself in a container** (Docker-out-of-Docker — mount the
-host socket so the agent can spawn sibling sandbox containers):
+Run the agent itself in a container — Docker-out-of-Docker, mounting the host
+socket so the agent can spawn sibling sandbox containers:
 
 ```bash
 docker build -t aas-code-sandbox .
@@ -57,6 +50,27 @@ The mounted socket means the `docker run` *inside* the agent talks to the **host
 Docker daemon, so each sandbox is a **sibling** container on the host, not a nested
 one. That's the Docker-out-of-Docker (DooD) pattern — the same way a dev container
 (like the one this repo runs in) hands an agent a Docker it can drive.
+
+## Run with Docker (in a devcontainer with DooD)
+
+Under nested Docker-outside-of-Docker the foreground `docker run` may print nothing
+after the first moment — run detached and follow the logs; the daemon captures all
+of it:
+
+```bash
+docker logs -f "$(docker run -d --env-file .env \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  aas-code-sandbox "What is the 30th Fibonacci number? Use code.")"
+```
+
+## Run locally
+
+The agent shells out to your host's Docker directly:
+
+```bash
+pip install -r requirements.txt
+python app.py "What is the 30th Fibonacci number? Use code."
+```
 
 ## How it works
 
