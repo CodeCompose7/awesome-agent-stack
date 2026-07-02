@@ -68,7 +68,14 @@ function normalizeVersion(tag?: string): string | undefined {
   return /^v\d/i.test(t) ? t : /^\d/.test(t) ? `v${t}` : t;
 }
 
-async function fetchStats(owner: string, repo: string): Promise<RepoStats | null> {
+type FetchedStats = RepoStats & {
+  // False when the release/tag lookups errored (rate limit, network) — the
+  // version fields are then *unknown*, not known-absent, and must not
+  // overwrite a previously cached version.
+  versionResolved: boolean;
+};
+
+async function fetchStats(owner: string, repo: string): Promise<FetchedStats | null> {
   try {
     const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, { headers: headers() });
     if (!res.ok) return null;
@@ -77,6 +84,7 @@ async function fetchStats(owner: string, repo: string): Promise<RepoStats | null
 
     let version: string | undefined;
     let releasedAt: string | undefined;
+    let versionResolved = false;
     const rel = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases/latest`, {
       headers: headers(),
     });
@@ -84,13 +92,17 @@ async function fetchStats(owner: string, repo: string): Promise<RepoStats | null
       const data = await rel.json();
       version = normalizeVersion(data.tag_name);
       releasedAt = data.published_at; // e.g. "2026-05-12T09:00:00Z"
-    } else {
-      // No releases — fall back to the most recent tag. Tags carry no date, so
-      // fetch the commit they point to for the update date.
+      versionResolved = true;
+    } else if (rel.status === 404) {
+      // 404 = the repo genuinely has no releases — fall back to the most
+      // recent tag. Anything else (403 rate limit, 5xx) means we don't know,
+      // so skip the fallback and leave versionResolved false.
+      // Tags carry no date, so fetch the commit they point to for the date.
       const tags = await fetch(`https://api.github.com/repos/${owner}/${repo}/tags?per_page=1`, {
         headers: headers(),
       });
       if (tags.ok) {
+        versionResolved = true;
         const tag = (await tags.json())[0];
         version = normalizeVersion(tag?.name);
         if (tag?.commit?.url) {
@@ -102,7 +114,7 @@ async function fetchStats(owner: string, repo: string): Promise<RepoStats | null
         }
       }
     }
-    return { stars, version, releasedAt };
+    return { stars, version, releasedAt, versionResolved };
   } catch {
     return null;
   }
@@ -122,9 +134,16 @@ export function getRepoStats(repoUrl?: string): Promise<RepoStats | null> {
         key,
         fetchStats(slug.owner, slug.repo).then((stats) => {
           if (stats) {
-            disk[key] = { ...stats, fetchedAt: Date.now() };
+            const { versionResolved, ...fresh } = stats;
+            if (!versionResolved && cached?.version) {
+              // Partial refresh (stars OK, release lookup rate-limited):
+              // keep the last known release info instead of clobbering it.
+              fresh.version = cached.version;
+              fresh.releasedAt = cached.releasedAt;
+            }
+            disk[key] = { ...fresh, fetchedAt: Date.now() };
             persist();
-            return stats;
+            return fresh;
           }
           return cached ? strip(cached) : null; // rate-limited/offline → last known
         }),
