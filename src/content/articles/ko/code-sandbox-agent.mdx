@@ -73,7 +73,9 @@ flowchart TB
   class dock roleSource
 ```
 
-### `run_python(code)` — 도구 \{#run-python}
+### 세부 구조 \{#detailed-structure}
+
+#### `run_python(code)` — 도구 \{#run-python}
 
 ```mermaid
 flowchart TB
@@ -128,7 +130,7 @@ def run_python(code: str) -> str:
 
 *발췌 — 오류 처리는 생략했습니다. 전체 코드는 [구현](#the-implementation) 섹션에 있습니다.*
 
-### `message_text(content)` — 출력 다듬기 \{#message-text}
+#### `message_text(content)` — 출력 다듬기 \{#message-text}
 
 ```mermaid
 flowchart TB
@@ -163,7 +165,7 @@ def message_text(content) -> str:
     return content
 ```
 
-### `main()` — 조립 \{#main}
+#### `main()` — 조립 \{#main}
 
 ```mermaid
 flowchart TB

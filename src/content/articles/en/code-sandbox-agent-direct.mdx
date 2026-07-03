@@ -18,9 +18,11 @@ tags: [sandbox, docker, agent, tutorial, langgraph, litellm]
 import SampleProject from '../../../components/SampleProject.astro';
 
 In [[code-sandbox-agent|the code-sandbox agent]] we built the loop with two lines of `create_agent`.  
-This post rebuilds the **same agent** without [[LangChain]] — the only dependencies are [[LiteLLM]] (model routing) and [[LangGraph]] (the loop runtime).  
+This post rebuilds the **same agent** without [[LangChain]].  
+The only dependencies are [[LiteLLM]] (model routing) and [[LangGraph]] (the loop runtime).  
 
-Why this composition works at all is covered layer by layer in [[litellm-langgraph-vs-langchain|Dropping LangChain]]; here we turn that "option B" into a working agent.
+Why this composition works at all is covered layer by layer in [[litellm-langgraph-vs-langchain|Dropping LangChain]];  
+here we turn that "option B" into a working agent.
 
 ## What we're building \{#what-were-building}
 
@@ -74,7 +76,9 @@ flowchart TB
   class dock roleSource
 ```
 
-### `RUN_PYTHON` — the hand-written tool schema \{#tool-schema}
+### The detailed structure \{#detailed-structure}
+
+#### `RUN_PYTHON` — the hand-written tool schema \{#tool-schema}
 
 With LangChain, `@tool` derived the schema from the function signature and docstring.  
 Here the schema is your code — the `description` inherits the docstring's job: it's what the model reads to decide *when* to reach for code.
@@ -103,7 +107,7 @@ RUN_PYTHON = {
 
 The `run_python()` function itself is [identical to the original's](../../article/code-sandbox-agent/#run-python) — it pipes code into a flag-guarded `docker run`, and the sandbox doesn't care which framework called it.
 
-### `call_model` — the model node \{#call-model}
+#### `call_model` — the model node \{#call-model}
 
 ```mermaid
 flowchart TB
@@ -139,7 +143,7 @@ def call_model(state: State) -> State:
     return {"messages": state["messages"] + [msg]}
 ```
 
-### `call_tools` — the tool node, dispatched by hand \{#call-tools}
+#### `call_tools` — the tool node, dispatched by hand \{#call-tools}
 
 ```mermaid
 flowchart TB
@@ -177,7 +181,7 @@ def call_tools(state: State) -> State:
     return {"messages": state["messages"] + results}
 ```
 
-### `route` and the graph wiring \{#the-graph}
+#### `route` and the graph wiring \{#the-graph}
 
 ```mermaid
 flowchart TB

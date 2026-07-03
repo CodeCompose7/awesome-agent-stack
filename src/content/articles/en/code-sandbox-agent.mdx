@@ -73,7 +73,9 @@ flowchart TB
   class dock roleSource
 ```
 
-### `run_python(code)` — the tool \{#run-python}
+### The detailed structure \{#detailed-structure}
+
+#### `run_python(code)` — the tool \{#run-python}
 
 ```mermaid
 flowchart TB
@@ -128,7 +130,7 @@ def run_python(code: str) -> str:
 
 *Excerpt — error handling omitted; the full code is in the [Implementation](#the-implementation) section.*
 
-### `message_text(content)` — tidying output \{#message-text}
+#### `message_text(content)` — tidying output \{#message-text}
 
 ```mermaid
 flowchart TB
@@ -163,7 +165,7 @@ def message_text(content) -> str:
     return content
 ```
 
-### `main()` — wiring \{#main}
+#### `main()` — wiring \{#main}
 
 ```mermaid
 flowchart TB
