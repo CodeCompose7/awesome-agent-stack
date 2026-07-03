@@ -64,7 +64,9 @@ const usedBy = [
 
 <Breadcrumb segments={crumbs} />
 
-<div class="mt-6">
+{/* aas-reading gives the README body the same serif reading typography the
+    articles and stack tabs use; the viewer's own chrome opts back out. */}
+<div class="aas-reading mt-6">
   <ProjectViewer lang={lang} projects={projects} related={related} />
 </div>
 
