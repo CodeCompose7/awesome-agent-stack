@@ -31,6 +31,7 @@ export const ui = {
     'sample.tagline':
       'The runnable mini-projects behind the catalog — download a folder and run it with Docker.',
     'sample.usedBy': 'Used by',
+    'sample.related': 'Related sample',
     'glossary.title': 'Glossary',
     'glossary.tagline': 'Terms used across the catalog and concepts, each linked to its page.',
     'glossary.tool': 'Tools',
@@ -146,6 +147,7 @@ export const ui = {
     'sample.title': '샘플',
     'sample.tagline': '카탈로그 뒤의 실행 가능한 미니 프로젝트 — 폴더를 받아 Docker로 실행해 보세요.',
     'sample.usedBy': '이 샘플을 쓰는 곳',
+    'sample.related': '관련 샘플',
     'glossary.title': '용어집',
     'glossary.tagline': '카탈로그와 개념 전반에서 쓰는 용어, 그리고 각 용어가 가리키는 페이지.',
     'glossary.tool': '도구',
