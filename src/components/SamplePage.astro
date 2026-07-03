@@ -6,6 +6,7 @@ import { getRelativeLocaleUrl } from 'astro:i18n';
 import Breadcrumb from './Breadcrumb.astro';
 import MermaidLoader from './MermaidLoader.astro';
 import ProjectViewer from './ProjectViewer.astro';
+import TocRail from './TocRail.astro';
 import { renderProjects } from '../lib/project';
 import { getStacks, slugOf, toolResolver, type ToolRef } from '../lib/stacks';
 import { getArticles, articleSlugOf } from '../lib/articles';
@@ -44,7 +45,14 @@ const usedByArticles = articles.filter((a) => {
 });
 
 const resolveTool = await toolResolver(lang);
-const related = new Map<string, ToolRef[]>([[folder, [...relatedSlugs].map(resolveTool)]]);
+const railTools = [...relatedSlugs].map(resolveTool);
+const related = new Map<string, ToolRef[]>([[folder, railTools]]);
+
+// The fixed right rail, wired like an article that embeds this sample: the
+// README's h2/h3 as the TOC, the related tools, and the clickable file list.
+const project = projects[0];
+const tocItems = project?.headings ?? [];
+const projectFiles = project ? { folder: project.folder, files: project.files } : undefined;
 
 const crumbs = [
   { label: t('sample.title'), href: getRelativeLocaleUrl(lang, 'sample/') },
@@ -64,10 +72,15 @@ const usedBy = [
 
 <Breadcrumb segments={crumbs} />
 
-{/* aas-reading gives the README body the same serif reading typography the
-    articles and stack tabs use; the viewer's own chrome opts back out. */}
-<div class="aas-reading mt-6">
-  <ProjectViewer lang={lang} projects={projects} related={related} />
+{/* Content + the same fixed right rail an article page has (README TOC,
+    related tools, file list). `embedded` drops the viewer's inline sidebar at
+    rail widths so the files aren't listed twice; aas-reading gives the README
+    body the same serif reading typography the articles and stack tabs use. */}
+<div class="mt-6 flex items-start gap-8">
+  <div class="aas-reading min-w-0 flex-1">
+    <ProjectViewer lang={lang} projects={projects} related={related} embedded />
+  </div>
+  <TocRail lang={lang} items={tocItems} relatedTools={railTools} projectFiles={projectFiles} />
 </div>
 
 {
