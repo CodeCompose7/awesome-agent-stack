@@ -102,6 +102,32 @@ flowchart TB
   - `--rm`(일회용)
 - `timeout=30`으로 폭주 코드를 끊고, 출력은 앞부분 4,000자로 자름
 
+```python
+@tool
+def run_python(code: str) -> str:
+    """Run a snippet of Python and return its stdout/stderr. …"""
+    proc = subprocess.run(
+        [
+            "docker", "run", "--rm", "-i",
+            "--network", "none",      # no network: nothing leaves the box
+            "--memory", "256m",       # memory cap
+            "--cpus", "1",            # cpu cap
+            "--pids-limit", "128",    # process cap (fork-bomb guard)
+            "--user", "65534:65534",  # run as nobody, not root
+            SANDBOX_IMAGE,
+            "python", "-",            # read the program from stdin
+        ],
+        input=code,
+        capture_output=True,
+        text=True,
+        timeout=30,                   # wall-clock guard
+    )
+    out = (proc.stdout or "") + (proc.stderr or "")
+    return out.strip()[:4000] or "(no output)"
+```
+
+*발췌 — 오류 처리는 생략했습니다. 전체 코드는 [구현](#the-implementation) 섹션에 있습니다.*
+
 ### `message_text(content)` — 출력 다듬기 \{#message-text}
 
 ```mermaid
@@ -125,6 +151,18 @@ flowchart TB
   - 클라우드는 문자열, 일부 로컬 모델은 블록 리스트
 - 리스트면 `type == "text"` 블록만 이어붙이고, 문자열이면 그대로 둠
 
+```python
+def message_text(content) -> str:
+    """Flatten an assistant message's content to plain text."""
+    if isinstance(content, list):
+        return "".join(
+            part.get("text", "")
+            for part in content
+            if isinstance(part, dict) and part.get("type") == "text"
+        )
+    return content
+```
+
 ### `main()` — 배선 \{#main}
 
 ```mermaid
@@ -147,6 +185,20 @@ flowchart TB
 - `MODEL`로 `ChatLiteLLM`을 만들고 `create_agent(model, tools=[run_python])`로 ReAct 루프 구성
 - `agent.invoke({"messages": […]})`가 추론→도구 호출→관찰을 돌림
 - 끝나면 마지막 메시지를 `message_text()`로 다듬어 출력
+
+```python
+def main() -> None:
+    question = " ".join(sys.argv[1:]) or "What is the 30th Fibonacci number? Use code."
+
+    # MODEL chooses the provider (claude-opus-4-8 / gpt-4o / gemini/gemini-2.5-flash).
+    model = ChatLiteLLM(model=os.environ.get("MODEL", "claude-opus-4-8"), temperature=0)
+    agent = create_agent(model, tools=[run_python])
+
+    result = agent.invoke({"messages": [{"role": "user", "content": question}]})
+    final = result["messages"][-1]
+    answer = (message_text(final.content) or "").strip()
+    print(answer or f"[no text in the final message] {final!r}")
+```
 
 ## 구현 \{#the-implementation}
 

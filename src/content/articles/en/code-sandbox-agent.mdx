@@ -102,6 +102,32 @@ flowchart TB
   - `--rm` (throwaway)
 - `timeout=30` kills runaway code; output is truncated to the first 4,000 chars
 
+```python
+@tool
+def run_python(code: str) -> str:
+    """Run a snippet of Python and return its stdout/stderr. …"""
+    proc = subprocess.run(
+        [
+            "docker", "run", "--rm", "-i",
+            "--network", "none",      # no network: nothing leaves the box
+            "--memory", "256m",       # memory cap
+            "--cpus", "1",            # cpu cap
+            "--pids-limit", "128",    # process cap (fork-bomb guard)
+            "--user", "65534:65534",  # run as nobody, not root
+            SANDBOX_IMAGE,
+            "python", "-",            # read the program from stdin
+        ],
+        input=code,
+        capture_output=True,
+        text=True,
+        timeout=30,                   # wall-clock guard
+    )
+    out = (proc.stdout or "") + (proc.stderr or "")
+    return out.strip()[:4000] or "(no output)"
+```
+
+*Excerpt — error handling omitted; the full code is in the [Implementation](#the-implementation) section.*
+
 ### `message_text(content)` — tidying output \{#message-text}
 
 ```mermaid
@@ -125,6 +151,18 @@ flowchart TB
   - a string from cloud models, a list of blocks from some local ones
 - Join the `type == "text"` blocks if it's a list; leave a string as-is
 
+```python
+def message_text(content) -> str:
+    """Flatten an assistant message's content to plain text."""
+    if isinstance(content, list):
+        return "".join(
+            part.get("text", "")
+            for part in content
+            if isinstance(part, dict) and part.get("type") == "text"
+        )
+    return content
+```
+
 ### `main()` — wiring \{#main}
 
 ```mermaid
@@ -147,6 +185,20 @@ flowchart TB
 - Build `ChatLiteLLM` from `MODEL` and a ReAct loop with `create_agent(model, tools=[run_python])`
 - `agent.invoke({"messages": […]})` runs reason → tool call → observe
 - When it finishes, clean the last message with `message_text()` and print it
+
+```python
+def main() -> None:
+    question = " ".join(sys.argv[1:]) or "What is the 30th Fibonacci number? Use code."
+
+    # MODEL chooses the provider (claude-opus-4-8 / gpt-4o / gemini/gemini-2.5-flash).
+    model = ChatLiteLLM(model=os.environ.get("MODEL", "claude-opus-4-8"), temperature=0)
+    agent = create_agent(model, tools=[run_python])
+
+    result = agent.invoke({"messages": [{"role": "user", "content": question}]})
+    final = result["messages"][-1]
+    answer = (message_text(final.content) or "").strip()
+    print(answer or f"[no text in the final message] {final!r}")
+```
 
 ## The implementation \{#the-implementation}
 
