@@ -17,10 +17,10 @@
  *   [[langgraph]]              → same (lookup is case-insensitive)
  *   [[langgraph|그 프레임워크]] → custom link text, same target
  *
- * A term needs exactly one link target — `stack`, `concept`, or `href` — OR none,
- * in which case it's a definition-only term (`def` required): its `[[Term]]` links
- * to its entry on the glossary page. `def` is an optional short definition shown on
- * the glossary card and as a hover tooltip on the `[[Term]]` link (any kind may set it).
+ * A term needs exactly one link target — `stack`, `concept`, `article`, or `href` —
+ * OR none, in which case it's a definition-only term (`def` required): its `[[Term]]`
+ * links to its entry on the glossary page. `def` is an optional short definition shown
+ * on the glossary card and as a hover tooltip on the `[[Term]]` link (any kind may set it).
  *
  * @typedef {string | { ko: string; en: string }} Label
  * @typedef {Object} GlossaryEntry
@@ -28,6 +28,7 @@
  *                              whose wording differs by locale use `{ ko, en }`.
  * @property {string} [stack]   Catalog stack slug  → `../../stack/<slug>/`.
  * @property {string} [concept] Concept slug        → `../../concept/<slug>/`.
+ * @property {string} [article] Article slug        → `../../article/<slug>/`.
  * @property {string} [href]    External absolute URL (a term without a page yet).
  * @property {Label}  [def]     Short definition (def-only terms need it; optional else).
  */
@@ -50,6 +51,25 @@ export const glossary = {
       ko: '추론(Reason)과 행동(Act)을 번갈아 수행하는 에이전트 루프.',
       en: 'An agent loop that interleaves reasoning and acting (Reason + Act).',
     },
+  },
+  // Article terms — cross-reference a post from any body without hardcoding its
+  // URL: [[code-sandbox-agent|코드 샌드박스]] renders the custom text, and a
+  // renamed/moved article is a one-line fix here instead of a hunt for links.
+  'code-sandbox-agent': {
+    label: { ko: '코드 샌드박스 에이전트', en: 'Code-sandbox agent' },
+    article: 'code-sandbox-agent',
+  },
+  'web-scraping-agent': {
+    label: { ko: '웹 스크래핑 에이전트', en: 'Web-scraping agent' },
+    article: 'web-scraping-agent',
+  },
+  'web-search-fx-agent': {
+    label: { ko: '웹 검색 환율 에이전트', en: 'Web-search FX agent' },
+    article: 'web-search-fx-agent',
+  },
+  'litellm-langgraph-vs-langchain': {
+    label: { ko: 'LangChain 없이 만들면', en: 'Dropping LangChain' },
+    article: 'litellm-langgraph-vs-langchain',
   },
   // Definition-only term (no page — [[DooD]] links to its glossary entry):
   dood: {
