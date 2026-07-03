@@ -560,7 +560,10 @@ summary {
 .prose :where(a):hover {
   text-decoration: underline;
 }
-.prose :where(code):not(pre code) {
+/* Inline code chips in running prose. Chips inside card-style UI links
+   (a.aas-lift — e.g. the project viewer's GitHub button) style themselves
+   with utilities and must not pick this up. */
+.prose :where(code):not(pre code, .aas-lift code) {
   background: var(--aas-panel);
   border: 1px solid var(--aas-border);
   border-radius: 0.3rem;
