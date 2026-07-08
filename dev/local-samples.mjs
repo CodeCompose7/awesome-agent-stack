@@ -31,6 +31,11 @@ const BASE_CSS = `
   .spacer { margin-left: auto }`;
 
 const MODAL_CSS = `
+  .runbar { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap }
+  .runbar-lbl { font-size: .8rem; color: var(--muted) }
+  .runbar select { font: inherit; font-size: .85rem; padding: .4rem .6rem; border: 1px solid var(--border);
+                   border-radius: .5rem; background: var(--panel); color: var(--text) }
+  .recipe-desc { margin-top: .45rem; font-size: .8rem; color: var(--muted) }
   .runbtn { font: inherit; font-size: .85rem; cursor: pointer; color: #fff; background: var(--accent);
             border: 0; border-radius: .5rem; padding: .4rem .8rem }
   .runbtn:hover { filter: brightness(1.08) }
@@ -96,9 +101,33 @@ export function localSamples() {
     );
   };
 
-  // A runnable sample is a folder with a Dockerfile.
+  // Run recipes offered for a sample: the built-in "default" (docker build +
+  // run) when there's a Dockerfile, plus one per run/<id>.sh — each script
+  // declaring its own display name/description via `# @name` / `# @desc` header
+  // comments. A script recipe can do anything (compose, multi-step, …).
   /** @param {string} dir */
-  const runnable = (dir) => existsSync(join(dir, 'Dockerfile'));
+  const listRecipes = (dir) => {
+    /** @type {{id:string,name:string,desc:string}[]} */
+    const recipes = [];
+    if (existsSync(join(dir, 'Dockerfile')))
+      recipes.push({ id: '__default', name: '기본 · docker build + run', desc: 'Dockerfile을 빌드해 실행합니다 (DooD 샘플은 detached + logs).' });
+    const runDir = join(dir, 'run');
+    if (existsSync(runDir) && statSync(runDir).isDirectory()) {
+      for (const f of readdirSync(runDir).filter((n) => n.endsWith('.sh')).sort()) {
+        const src = readFileSync(join(runDir, f), 'utf8');
+        const id = f.replace(/\.sh$/, '');
+        recipes.push({
+          id,
+          name: (src.match(/^#\s*@name\s+(.+)$/m)?.[1] ?? id).trim(),
+          desc: (src.match(/^#\s*@desc\s+(.+)$/m)?.[1] ?? '').trim(),
+        });
+      }
+    }
+    return recipes;
+  };
+  // A runnable sample offers at least one recipe.
+  /** @param {string} dir */
+  const runnable = (dir) => listRecipes(dir).length > 0;
   // Docker-out-of-Docker samples mount the host socket (the agent spawns sibling
   // containers); detected from their own committed files, not hard-coded.
   /** @param {string} dir */
@@ -202,13 +231,13 @@ export function localSamples() {
   // line matches the preview and is copy-paste-safe into a shell.
   /** @param {string} a */
   const shellish = (a) => (a === '' || /[\s"]/.test(a) ? '"' + a.replace(/"/g, '\\"') + '"' : a);
-  /** @param {any} res @param {string} cmd @param {string[]} args */
-  const runStep = (res, cmd, args) =>
+  /** @param {any} res @param {string} cmd @param {string[]} args @param {{cwd?:string}} [opts] */
+  const runStep = (res, cmd, args, opts = {}) =>
     new Promise((resolve) => {
       res.write('$ ' + cmd + ' ' + args.map(shellish).join(' ') + '\n');
       let child;
       try {
-        child = spawn(cmd, args);
+        child = spawn(cmd, args, opts);
       } catch (e) {
         res.write('[spawn error] ' + (/** @type {Error} */ (e)).message + '\n');
         return resolve(1);
@@ -296,13 +325,32 @@ export function localSamples() {
               return res.end('{"ok":false}');
             }
           }
-          // __run: docker build, then docker run, streaming the output.
+          // __run: execute the chosen recipe, streaming its output.
           res.setHeader('Content-Type', 'text/plain; charset=utf-8');
           res.setHeader('Cache-Control', 'no-cache');
           let task = '';
+          let recipe = '__default';
           try {
-            task = String(JSON.parse(String(body) || '{}').task || '');
+            const b = JSON.parse(String(body) || '{}');
+            task = String(b.task || '');
+            recipe = String(b.recipe || '__default');
           } catch {}
+
+          // A custom recipe: run/<id>.sh, executed with the sample dir as cwd so
+          // relative paths (.env, compose.yml, …) resolve. The id is validated
+          // against a strict charset — no path traversal.
+          if (recipe !== '__default') {
+            if (!/^[a-z0-9_-]+$/i.test(recipe) || !existsSync(join(dir, 'run', recipe + '.sh'))) {
+              res.write('[error] 알 수 없는 레시피: ' + recipe + '\n');
+              return res.end();
+            }
+            const args = ['run/' + recipe + '.sh'];
+            if (task) args.push(task);
+            await runStep(res, 'bash', args, { cwd: dir });
+            return res.end();
+          }
+
+          // The built-in default: docker build, then docker run.
           if (!existsSync(join(dir, '.env'))) {
             res.write('[error] .env가 없습니다. 먼저 환경 변수를 저장하세요.\n');
             return res.end();
@@ -364,6 +412,7 @@ export function localSamples() {
           let runUi = '';
           if (runnable(target)) {
             const folder = parts[parts.length - 1];
+            const recipes = listRecipes(target);
             const runData = {
               folder,
               image: imageName(folder),
@@ -371,14 +420,21 @@ export function localSamples() {
               defaultTask: defaultTask(target),
               env: parseEnvSample(target),
               values: readEnv(target),
+              recipes,
             };
             const dataJson = JSON.stringify(runData).replace(/</g, '\\u003c');
+            const esc = (/** @type {string} */ s) =>
+              s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            const options = recipes
+              .map((r) => `<option value="${esc(r.id)}">${esc(r.name)}</option>`)
+              .join('');
             runUi =
-              `<button id="run-open" class="runbtn">▶ 실행해보기</button>` +
+              `<div class="runbar"><label class="runbar-lbl">레시피</label><select id="recipe">${options}</select><button id="run-open" class="runbtn">실행 ▶</button></div>` +
+              `<p id="recipe-desc" class="recipe-desc"></p>` +
               `<div id="run-modal" hidden><div class="backdrop"></div><div class="dialog">` +
               `<div class="stepper"><span data-step="1" class="active">1 · 환경 변수</span><span data-step="2">2 · 실행 인자</span><span data-step="3">3 · 실행 · 결과</span></div>` +
               `<section data-panel="1"><p class="desc">컨테이너에 넘길 <code>.env</code> 값입니다. 저장하면 <code>samples/${folder}/.env</code> 에 기록됩니다.</p><div id="env-fields"></div><div class="actions"><button data-close class="ghost">취소</button><button data-next class="primary">저장하고 다음</button></div></section>` +
-              `<section data-panel="2" hidden><label class="lbl">실행 인자 (app.py 에 전달)</label><textarea id="task" rows="2"></textarea><label class="lbl">실행될 명령</label><pre id="cmd-preview" class="cmd"></pre><div class="actions"><button data-back1 class="ghost">이전</button><button data-run class="primary">실행 ▶</button></div></section>` +
+              `<section data-panel="2" hidden><label class="lbl">실행 인자 (task)</label><textarea id="task" rows="2"></textarea><label class="lbl">실행될 명령</label><pre id="cmd-preview" class="cmd"></pre><div class="actions"><button data-back1 class="ghost">이전</button><button data-run class="primary">실행 ▶</button></div></section>` +
               `<section data-panel="3" hidden><pre id="run-log" class="terminal"></pre><div class="actions"><button data-back2 class="ghost">이전</button><button data-run class="primary">다시 실행</button><button data-close class="ghost">닫기</button></div></section>` +
               `</div></div>` +
               `<script type="application/json" id="run-data">${dataJson}</script><script>${CLIENT_JS}</script>`;

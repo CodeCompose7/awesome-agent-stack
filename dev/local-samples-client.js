@@ -10,6 +10,20 @@
   var taskEl = document.getElementById('task');
   var cmdEl = document.getElementById('cmd-preview');
   var logEl = document.getElementById('run-log');
+  var recipeEl = document.getElementById('recipe');
+  var recipeDescEl = document.getElementById('recipe-desc');
+
+  function recipeById(id) {
+    for (var i = 0; i < data.recipes.length; i++) if (data.recipes[i].id === id) return data.recipes[i];
+    return data.recipes[0];
+  }
+  // The recipe picked on the page; captured when the wizard opens.
+  var recipe = recipeEl.value;
+  function syncRecipeDesc() {
+    recipeDescEl.textContent = recipeById(recipeEl.value).desc || '';
+  }
+  recipeEl.addEventListener('change', syncRecipeDesc);
+  syncRecipeDesc();
 
   // Step 1 — build the env form from the .env.sample schema, prefilled with the
   // current .env values. Secret fields render masked with a show/hide toggle.
@@ -51,12 +65,16 @@
     fields.appendChild(wrap);
   });
 
-  // Step 2 — the command preview updates live as the task is edited. DooD
-  // samples show the detached + `docker logs -f` form (matching the README and
-  // what actually runs): a foreground run is swallowed by nested Docker.
+  // Step 2 — the command preview updates live as the task is edited, and
+  // reflects the chosen recipe. A custom recipe runs its run/<id>.sh; the
+  // built-in default assembles the docker command (DooD shows the detached +
+  // `docker logs -f` form, matching the README and what actually runs).
   function buildCmd(task) {
-    var build = 'docker build -t ' + data.image + ' .';
     var q = task ? ' "' + task + '"' : '';
+    if (recipe !== '__default') {
+      return 'bash run/' + recipe + '.sh' + q;
+    }
+    var build = 'docker build -t ' + data.image + ' .';
     if (data.dood) {
       return (
         build +
@@ -87,6 +105,8 @@
     }
   }
   function open() {
+    recipe = recipeEl.value; // lock in the recipe chosen on the page
+    refreshCmd();
     modal.hidden = false;
     showStep(1);
   }
@@ -122,7 +142,7 @@
       var resp = await fetch('__run', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ task: taskEl.value.trim() }),
+        body: JSON.stringify({ task: taskEl.value.trim(), recipe: recipe }),
       });
       var reader = resp.body.getReader();
       var dec = new TextDecoder();
