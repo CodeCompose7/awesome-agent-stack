@@ -28,23 +28,20 @@ const BASE_CSS = `
   .crumbs b { color: var(--text) }
   .badge { font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; color: var(--muted);
            border: 1px dashed var(--border); border-radius: .4rem; padding: .15rem .5rem }
-  .spacer { margin-left: auto }`;
+  .spacer { margin-left: auto }
+  .runbtn { display: inline-block; font: inherit; font-size: .85rem; cursor: pointer; color: #fff;
+            background: var(--accent); border: 0; border-radius: .5rem; padding: .45rem .85rem; text-decoration: none }
+  .runbtn:hover { filter: brightness(1.08) }`;
 
-const MODAL_CSS = `
+// The run wizard, rendered as a full page (own URL) rather than a modal.
+const WIZARD_CSS = `
   .runbar { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap }
   .runbar-lbl { font-size: .8rem; color: var(--muted) }
   .runbar select { font: inherit; font-size: .85rem; padding: .4rem .6rem; border: 1px solid var(--border);
                    border-radius: .5rem; background: var(--panel); color: var(--text) }
   .recipe-desc { margin-top: .45rem; font-size: .8rem; color: var(--muted) }
-  .runbtn { font: inherit; font-size: .85rem; cursor: pointer; color: #fff; background: var(--accent);
-            border: 0; border-radius: .5rem; padding: .4rem .8rem }
-  .runbtn:hover { filter: brightness(1.08) }
-  #run-modal[hidden] { display: none }
-  #run-modal { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 1.25rem; z-index: 50 }
-  #run-modal .backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.45) }
-  .dialog { position: relative; width: 100%; max-width: 40rem; max-height: 90vh; overflow: auto;
-            background: var(--bg); border: 1px solid var(--border); border-radius: .9rem; padding: 1.25rem }
-  .stepper { display: flex; gap: .5rem; font-size: .78rem; color: var(--muted); margin-bottom: 1rem }
+  .wizard { margin-top: 1.1rem; border: 1px solid var(--border); border-radius: .9rem; padding: 1.25rem; background: var(--panel) }
+  .stepper { display: flex; gap: .5rem; font-size: .78rem; color: var(--muted); margin-bottom: 1rem; flex-wrap: wrap }
   .stepper span { border: 1px solid var(--border); border-radius: 999px; padding: .2rem .7rem }
   .stepper span.active { color: #fff; background: var(--accent); border-color: var(--accent) }
   .desc, .lbl { font-size: .85rem; color: var(--muted) }
@@ -55,12 +52,12 @@ const MODAL_CSS = `
   .inrow { display: flex; gap: .4rem; margin-top: .3rem }
   .inrow input { flex: 1; min-width: 0; font: inherit; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
                  font-size: .85rem; padding: .45rem .6rem; border: 1px solid var(--border); border-radius: .45rem;
-                 background: var(--panel); color: var(--text) }
+                 background: var(--bg); color: var(--text) }
   .reveal { font: inherit; font-size: .72rem; cursor: pointer; color: var(--muted); background: var(--tint);
             border: 1px solid var(--border); border-radius: .45rem; padding: 0 .6rem }
   #task { width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85rem;
           line-height: 1.5; padding: .5rem .6rem; border: 1px solid var(--border); border-radius: .45rem;
-          background: var(--panel); color: var(--text); resize: none; overflow: hidden; min-height: 2.6rem }
+          background: var(--bg); color: var(--text); resize: none; overflow: hidden; min-height: 2.6rem }
   .run-status { font-size: .8rem; margin-bottom: .5rem; min-height: 1.15em; color: var(--muted) }
   .run-status.busy { color: var(--accent); animation: aas-pulse 1.1s ease-in-out infinite }
   @keyframes aas-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .4 } }
@@ -305,6 +302,69 @@ export function localSamples() {
         if (!m) return next();
         const rel = decodeURIComponent(m[1].split('?')[0]);
 
+        // Dedicated run page: /local-samples/<folder>/__run-ui (own URL, so a
+        // refresh naturally reloads the wizard and it can open in a new tab).
+        const uiMatch = rel.match(/^(.+)\/__run-ui$/);
+        if (uiMatch) {
+          const dir = resolve(root, uiMatch[1]);
+          if (
+            (dir !== root && !dir.startsWith(root + sep)) ||
+            !existsSync(dir) ||
+            !statSync(dir).isDirectory() ||
+            !runnable(dir)
+          ) {
+            res.statusCode = 404;
+            return res.end('not found');
+          }
+          const folder = uiMatch[1].split('/').pop() || uiMatch[1];
+          const uiParts = uiMatch[1].split('/').filter(Boolean);
+          const recipes = listRecipes(dir);
+          const params = new URLSearchParams((req.url || '').split('?')[1] || '');
+          const wantRecipe = params.get('recipe');
+          const selected = recipes.some((r) => r.id === wantRecipe) ? wantRecipe : recipes[0].id;
+          const runData = {
+            folder,
+            image: imageName(folder),
+            dood: isDooD(dir),
+            defaultTask: defaultTask(dir),
+            env: parseEnvSample(dir),
+            values: readEnv(dir),
+            recipes,
+          };
+          const dataJson = JSON.stringify(runData).replace(/</g, '\\u003c');
+          const esc = (/** @type {string} */ s) =>
+            s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+          const options = recipes
+            .map((r) => `<option value="${esc(r.id)}"${r.id === selected ? ' selected' : ''}>${esc(r.name)}</option>`)
+            .join('');
+          const crumbs = [
+            `<a href="${'../'.repeat(uiParts.length)}">samples</a>`,
+            ...uiParts.map((p, i) => {
+              const up = uiParts.length - 1 - i;
+              return `<a href="${up === 0 ? './' : '../'.repeat(up)}">${p}</a>`;
+            }),
+            `<b>실행</b>`,
+          ].join('<span>/</span>');
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.end(`<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>samples/${folder} · 실행</title>
+<style>${BASE_CSS}${WIZARD_CSS}
+  main { max-width: 48rem }
+</style></head><body><main>
+<div class="crumbs">${crumbs}<span class="spacer"></span><a href="./">← 목록</a><span class="badge">dev only</span></div>
+<div class="runbar"><label class="runbar-lbl">레시피</label><select id="recipe">${options}</select></div>
+<p id="recipe-desc" class="recipe-desc"></p>
+<div class="wizard">
+  <div class="stepper"><span data-step="1" class="active">1 · 환경 변수</span><span data-step="2">2 · 실행 인자</span><span data-step="3">3 · 실행 · 결과</span></div>
+  <section data-panel="1"><p class="desc">컨테이너에 넘길 <code>.env</code> 값입니다. 저장하면 <code>samples/${folder}/.env</code> 에 기록됩니다.</p><div id="env-fields"></div><div class="actions"><button data-next class="primary">저장하고 다음</button></div></section>
+  <section data-panel="2" hidden><label class="lbl">실행 인자 (task)</label><textarea id="task" rows="2"></textarea><label class="lbl">실행될 명령</label><pre id="cmd-preview" class="cmd"></pre><div class="actions"><button data-back1 class="ghost">이전</button><button data-run class="primary">실행 ▶</button></div></section>
+  <section data-panel="3" hidden><div id="run-status" class="run-status"></div><pre id="run-log" class="terminal"></pre><div class="actions"><button data-back2 class="ghost">이전</button><button data-run class="primary">다시 실행</button></div></section>
+</div>
+<script type="application/json" id="run-data">${dataJson}</script><script>${CLIENT_JS}</script>
+</main></body></html>`);
+        }
+
         // Run-wizard endpoints: /local-samples/<folder>/__env|__run (POST).
         const action = rel.match(/^(.+)\/__(env|run)$/);
         if (action) {
@@ -412,43 +472,16 @@ export function localSamples() {
             ),
           ].join('<span>/</span>');
 
-          // Run wizard, only for a runnable sample folder.
-          let runUi = '';
-          if (runnable(target)) {
-            const folder = parts[parts.length - 1];
-            const recipes = listRecipes(target);
-            const runData = {
-              folder,
-              image: imageName(folder),
-              dood: isDooD(target),
-              defaultTask: defaultTask(target),
-              env: parseEnvSample(target),
-              values: readEnv(target),
-              recipes,
-            };
-            const dataJson = JSON.stringify(runData).replace(/</g, '\\u003c');
-            const esc = (/** @type {string} */ s) =>
-              s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-            const options = recipes
-              .map((r) => `<option value="${esc(r.id)}">${esc(r.name)}</option>`)
-              .join('');
-            runUi =
-              `<div class="runbar"><label class="runbar-lbl">레시피</label><select id="recipe">${options}</select><button id="run-open" class="runbtn">실행 ▶</button></div>` +
-              `<p id="recipe-desc" class="recipe-desc"></p>` +
-              `<div id="run-modal" hidden><div class="backdrop"></div><div class="dialog">` +
-              `<div class="stepper"><span data-step="1" class="active">1 · 환경 변수</span><span data-step="2">2 · 실행 인자</span><span data-step="3">3 · 실행 · 결과</span></div>` +
-              `<section data-panel="1"><p class="desc">컨테이너에 넘길 <code>.env</code> 값입니다. 저장하면 <code>samples/${folder}/.env</code> 에 기록됩니다.</p><div id="env-fields"></div><div class="actions"><button data-close class="ghost">취소</button><button data-next class="primary">저장하고 다음</button></div></section>` +
-              `<section data-panel="2" hidden><label class="lbl">실행 인자 (task)</label><textarea id="task" rows="2"></textarea><label class="lbl">실행될 명령</label><pre id="cmd-preview" class="cmd"></pre><div class="actions"><button data-back1 class="ghost">이전</button><button data-run class="primary">실행 ▶</button></div></section>` +
-              `<section data-panel="3" hidden><div id="run-status" class="run-status"></div><pre id="run-log" class="terminal"></pre><div class="actions"><button data-back2 class="ghost">이전</button><button data-run class="primary">다시 실행</button><button data-close class="ghost">닫기</button></div></section>` +
-              `</div></div>` +
-              `<script type="application/json" id="run-data">${dataJson}</script><script>${CLIENT_JS}</script>`;
-          }
+          // A runnable sample folder gets a link to its dedicated run page.
+          const runLink = runnable(target)
+            ? `<div style="margin-top:1rem"><a class="runbtn" href="__run-ui">▶ 실행</a></div>`
+            : '';
 
           res.setHeader('Content-Type', 'text/html; charset=utf-8');
           return res.end(`<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>samples/${rel}</title>
-<style>${BASE_CSS}${MODAL_CSS}
+<style>${BASE_CSS}
   ul { list-style: none; margin-top: 1rem; border: 1px solid var(--border); border-radius: .75rem; background: var(--panel); overflow: hidden; padding: .3rem }
   li + li { margin-top: 2px }
   li a { display: flex; align-items: center; gap: .65rem; padding: .55rem .75rem; border-radius: .5rem; color: var(--text); text-decoration: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem }
@@ -458,7 +491,7 @@ export function localSamples() {
   .size { margin-left: auto; flex: none; font-size: .75rem; color: var(--muted) }
 </style></head><body><main>
 <div class="crumbs">${crumbs}<span class="spacer"></span><span class="badge">dev only</span></div>
-${runUi ? `<div style="margin-top:1rem">${runUi}</div>` : ''}
+${runLink}
 <ul>${rows}</ul>
 </main></body></html>`);
         }
