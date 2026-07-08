@@ -6,6 +6,7 @@
 // gets a "run" wizard: edit .env, set the task, then docker build + run with
 // the output streamed back. Never active in `astro build` output.
 import { spawn } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve, sep } from 'node:path';
 
@@ -39,6 +40,7 @@ const WIZARD_CSS = `
   .runbar-lbl { font-size: .8rem; color: var(--muted) }
   .runbar select { font: inherit; font-size: .85rem; padding: .4rem .6rem; border: 1px solid var(--border);
                    border-radius: .5rem; background: var(--panel); color: var(--text) }
+  .runbar select:disabled { opacity: .55; cursor: default }
   .recipe-desc { margin-top: .45rem; font-size: .8rem; color: var(--muted) }
   .wizard { margin-top: 1.1rem; border: 1px solid var(--border); border-radius: .9rem; padding: 1.25rem; background: var(--panel) }
   .stepper { display: flex; gap: .5rem; font-size: .78rem; color: var(--muted); margin-bottom: 1rem; flex-wrap: wrap }
@@ -232,25 +234,68 @@ export function localSamples() {
   // line matches the preview and is copy-paste-safe into a shell.
   /** @param {string} a */
   const shellish = (a) => (a === '' || /[\s"]/.test(a) ? '"' + a.replace(/"/g, '\\"') + '"' : a);
-  /** @param {any} res @param {string} cmd @param {string[]} args @param {{cwd?:string}} [opts] */
-  const runStep = (res, cmd, args, opts = {}) =>
+  // A run job: the process output goes to a buffer AND fans out to any attached
+  // response(s). This decouples the run from a single HTTP connection, so a page
+  // refresh can reconnect (__run-log) and resume the live stream — the child
+  // keeps running regardless of who's listening.
+  /** @type {Map<string, { id:string, buffer:string, done:boolean, subs:Set<any>, write:(d:any)=>void, finish:()=>void }>} */
+  const jobs = new Map();
+  const createJob = () => {
+    const id = randomUUID().slice(0, 12);
+    const subs = new Set();
+    const job = {
+      id,
+      buffer: '',
+      done: false,
+      subs,
+      /** @param {any} d */
+      write(d) {
+        const s = typeof d === 'string' ? d : d.toString();
+        job.buffer += s;
+        for (const r of subs) {
+          try {
+            r.write(s);
+          } catch (e) {}
+        }
+      },
+      finish() {
+        job.done = true;
+        for (const r of subs) {
+          try {
+            r.end();
+          } catch (e) {}
+        }
+        subs.clear();
+        // Keep the completed job briefly so a refresh right at the end can still
+        // replay the full log, then evict.
+        setTimeout(() => {
+          if (jobs.get(id) === job) jobs.delete(id);
+        }, 5 * 60 * 1000);
+      },
+    };
+    jobs.set(id, job);
+    return job;
+  };
+
+  /** @param {{write:(d:any)=>void}} sink @param {string} cmd @param {string[]} args @param {{cwd?:string}} [opts] */
+  const runStep = (sink, cmd, args, opts = {}) =>
     new Promise((resolve) => {
-      res.write('$ ' + cmd + ' ' + args.map(shellish).join(' ') + '\n');
+      sink.write('$ ' + cmd + ' ' + args.map(shellish).join(' ') + '\n');
       let child;
       try {
         child = spawn(cmd, args, opts);
       } catch (e) {
-        res.write('[spawn error] ' + (/** @type {Error} */ (e)).message + '\n');
+        sink.write('[spawn error] ' + (/** @type {Error} */ (e)).message + '\n');
         return resolve(1);
       }
-      child.stdout.on('data', (d) => res.write(d));
-      child.stderr.on('data', (d) => res.write(d));
+      child.stdout.on('data', (d) => sink.write(d));
+      child.stderr.on('data', (d) => sink.write(d));
       child.on('error', (e) => {
-        res.write('\n[error] ' + e.message + '\n');
+        sink.write('\n[error] ' + e.message + '\n');
         resolve(1);
       });
       child.on('close', (code) => {
-        res.write('\n[exit ' + code + ']\n\n');
+        sink.write('\n[exit ' + code + ']\n\n');
         resolve(code);
       });
     });
@@ -259,28 +304,28 @@ export function localSamples() {
   // often prints nothing (the output only reaches the daemon log), so — as the
   // sample READMEs prescribe — run detached, follow `docker logs -f`, then
   // remove the container. `--rm` is dropped so the log survives to be read.
-  /** @param {any} res @param {string} image @param {string} envPath @param {string} task */
-  const runDooD = (res, image, envPath, task) =>
+  /** @param {{write:(d:any)=>void}} sink @param {string} image @param {string} envPath @param {string} task */
+  const runDooD = (sink, image, envPath, task) =>
     new Promise((resolve) => {
       const args = ['run', '-d', '--env-file', envPath, '-v', '/var/run/docker.sock:/var/run/docker.sock', image];
       if (task) args.push(task);
-      res.write('$ ' + ['docker', ...args].map(shellish).join(' ') + '\n');
+      sink.write('$ ' + ['docker', ...args].map(shellish).join(' ') + '\n');
       let id = '';
       const run = spawn('docker', args);
       run.stdout.on('data', (d) => (id += d.toString()));
-      run.stderr.on('data', (d) => res.write(d));
+      run.stderr.on('data', (d) => sink.write(d));
       run.on('error', (e) => {
-        res.write('\n[error] ' + e.message + '\n');
+        sink.write('\n[error] ' + e.message + '\n');
         resolve(1);
       });
       run.on('close', (code) => {
         id = id.trim();
         if (code !== 0 || !id) {
-          res.write('\n[exit ' + code + ']\n\n');
+          sink.write('\n[exit ' + code + ']\n\n');
           return resolve(code || 1);
         }
-        res.write('컨테이너 ' + id.slice(0, 12) + ' — 로그를 따라갑니다\n\n');
-        runStep(res, 'docker', ['logs', '-f', id]).then((lc) => {
+        sink.write('컨테이너 ' + id.slice(0, 12) + ' — 로그를 따라갑니다\n\n');
+        runStep(sink, 'docker', ['logs', '-f', id]).then((lc) => {
           const rm = spawn('docker', ['rm', '-f', id]);
           rm.on('close', () => resolve(lc));
           rm.on('error', () => resolve(lc));
@@ -389,9 +434,10 @@ export function localSamples() {
               return res.end('{"ok":false}');
             }
           }
-          // __run: execute the chosen recipe, streaming its output.
-          res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-          res.setHeader('Cache-Control', 'no-cache');
+          // __run: execute the chosen recipe into a job, streaming its output.
+          // The response subscribes to the job; the job (and its child process)
+          // outlive a client disconnect, so a refresh can reconnect via
+          // __run-log?job=<id> and resume the live stream.
           let task = '';
           let recipe = '__default';
           try {
@@ -400,40 +446,70 @@ export function localSamples() {
             recipe = String(b.recipe || '__default');
           } catch {}
 
+          const job = createJob();
+          res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+          res.setHeader('Cache-Control', 'no-cache');
+          res.setHeader('X-Run-Job', job.id);
+          job.subs.add(res);
+          res.on('close', () => job.subs.delete(res));
+
           // A custom recipe: run/<id>.sh, executed with the sample dir as cwd so
           // relative paths (.env, compose.yml, …) resolve. The id is validated
           // against a strict charset — no path traversal.
           if (recipe !== '__default') {
             if (!/^[a-z0-9_-]+$/i.test(recipe) || !existsSync(join(dir, 'run', recipe + '.sh'))) {
-              res.write('[error] 알 수 없는 레시피: ' + recipe + '\n');
-              return res.end();
+              job.write('[error] 알 수 없는 레시피: ' + recipe + '\n');
+              job.finish();
+              return;
             }
             const args = ['run/' + recipe + '.sh'];
             if (task) args.push(task);
-            await runStep(res, 'bash', args, { cwd: dir });
-            return res.end();
+            await runStep(job, 'bash', args, { cwd: dir });
+            job.finish();
+            return;
           }
 
           // The built-in default: docker build, then docker run.
           if (!existsSync(join(dir, '.env'))) {
-            res.write('[error] .env가 없습니다. 먼저 환경 변수를 저장하세요.\n');
-            return res.end();
+            job.write('[error] .env가 없습니다. 먼저 환경 변수를 저장하세요.\n');
+            job.finish();
+            return;
           }
           const folder = action[1].split('/').pop() || action[1];
           const image = imageName(folder);
           const envPath = join(dir, '.env');
-          const buildCode = await runStep(res, 'docker', ['build', '-t', image, dir]);
+          const buildCode = await runStep(job, 'docker', ['build', '-t', image, dir]);
           if (buildCode === 0) {
             if (isDooD(dir)) {
               // Detached + logs so the agent's output isn't swallowed by nested DooD.
-              await runDooD(res, image, envPath, task);
+              await runDooD(job, image, envPath, task);
             } else {
               const runArgs = ['run', '--rm', '--env-file', envPath, image];
               if (task) runArgs.push(task);
-              await runStep(res, 'docker', runArgs);
+              await runStep(job, 'docker', runArgs);
             }
           }
-          return res.end();
+          job.finish();
+          return;
+        }
+
+        // Reconnect to a running (or just-finished) job: replay its buffer, then
+        // stream the live continuation. Lets a refreshed page resume its run.
+        const logMatch = rel.match(/^(.+)\/__run-log$/);
+        if (logMatch) {
+          const id = new URLSearchParams((req.url || '').split('?')[1] || '').get('job') || '';
+          const job = jobs.get(id);
+          res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+          res.setHeader('Cache-Control', 'no-cache');
+          if (!job) {
+            res.statusCode = 404;
+            return res.end();
+          }
+          res.write(job.buffer);
+          if (job.done) return res.end();
+          job.subs.add(res);
+          res.on('close', () => job.subs.delete(res));
+          return;
         }
 
         const target = resolve(root, rel);

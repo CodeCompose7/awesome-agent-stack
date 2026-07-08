@@ -21,26 +21,22 @@
   }
   var recipe = recipeEl.value; // server pre-selects from ?recipe
 
-  // Per-sample+recipe persistence, so a refresh keeps the step and log. Keyed by
-  // recipe too, so switching recipes shows that recipe's own last run.
-  function keyFor(r) {
-    return 'aas-run:' + data.folder + ':' + r;
-  }
-  function load(r) {
-    try {
-      return JSON.parse(sessionStorage.getItem(keyFor(r)) || 'null');
-    } catch (e) {
-      return null;
-    }
-  }
-  var state = load(recipe) || { step: 1, task: '', log: '', status: '' };
+  // Per-sample persistence so a refresh keeps the step, log, and the job id
+  // (for live reconnect). The URL recipe is authoritative: if the saved run was
+  // for a different recipe, start fresh.
+  var KEY = 'aas-run:' + data.folder;
+  var state;
+  try {
+    state = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+  } catch (e) {}
+  if (!state || state.recipe !== recipe) state = { recipe: recipe, step: 1, task: '', log: '', status: '', job: '' };
   var lastSave = 0;
   function persist(force) {
     var now = Date.now();
     if (!force && now - lastSave < 400) return;
     lastSave = now;
     try {
-      sessionStorage.setItem(keyFor(recipe), JSON.stringify(state));
+      sessionStorage.setItem(KEY, JSON.stringify(state));
     } catch (e) {}
   }
 
@@ -129,6 +125,9 @@
     for (var j = 0; j < stepEls.length; j++) {
       stepEls[j].className = Number(stepEls[j].getAttribute('data-step')) <= n ? 'active' : '';
     }
+    // The recipe is a pre-flow choice: lock it once you leave step 1 (the
+    // command + run depend on it). Going back to step 1 re-enables it.
+    recipeEl.disabled = n !== 1;
     if (n === 2) autoGrow(); // measurable only once the panel is visible
     state.step = n;
     persist(true);
@@ -153,35 +152,26 @@
   }
 
   var running = false;
-  async function run() {
-    if (running) return;
-    running = true;
-    showStep(3);
-    logEl.textContent = '';
+  // Pump a streaming text response into the terminal with the elapsed ticker,
+  // persisting as it goes. `append` keeps prior text (reconnect replays first).
+  async function pump(resp, append) {
     var startedAt = Date.now();
     statusEl.className = 'run-status busy';
     statusEl.textContent = '● 실행 중… 0s';
-    state.status = 'running';
-    state.log = '';
-    persist(true);
     var timer = setInterval(function () {
       statusEl.textContent = '● 실행 중… ' + Math.round((Date.now() - startedAt) / 1000) + 's';
     }, 1000);
+    if (!append) logEl.textContent = '';
     try {
-      var resp = await fetch('__run', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ task: taskEl.value.trim(), recipe: recipe }),
-      });
       var reader = resp.body.getReader();
       var dec = new TextDecoder();
       for (;;) {
-        var res = await reader.read();
-        if (res.done) break;
-        logEl.textContent += dec.decode(res.value, { stream: true });
+        var r = await reader.read();
+        if (r.done) break;
+        logEl.textContent += dec.decode(r.value, { stream: true });
         logEl.scrollTop = logEl.scrollHeight;
         state.log = logEl.textContent;
-        persist(); // throttled
+        persist();
       }
     } catch (e) {
       logEl.textContent += '\n[client error] ' + e.message;
@@ -192,21 +182,72 @@
     state.status = 'done';
     state.log = logEl.textContent;
     persist(true);
+  }
+
+  async function run() {
+    if (running) return;
+    running = true;
+    showStep(3);
+    state.status = 'running';
+    state.log = '';
+    state.job = '';
+    persist(true);
+    try {
+      var resp = await fetch('__run', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ task: taskEl.value.trim(), recipe: recipe }),
+      });
+      var jobId = resp.headers.get('X-Run-Job');
+      if (jobId) {
+        state.job = jobId;
+        persist(true);
+      }
+      await pump(resp, false);
+    } catch (e) {
+      logEl.textContent += '\n[client error] ' + e.message;
+    }
     running = false;
   }
 
-  // Render the current step from state (restores step + log after a refresh; a
-  // run interrupted by a refresh shows its partial log with a note).
+  // Resume a job whose stream a refresh dropped: replay its buffer + continue
+  // live. Falls back to the saved partial log if the job is already gone.
+  async function reconnect(jobId) {
+    if (running) return;
+    running = true;
+    showStep(3);
+    logEl.textContent = state.log || '';
+    statusEl.className = 'run-status busy';
+    statusEl.textContent = '● 재접속 중…';
+    try {
+      var resp = await fetch('__run-log?job=' + encodeURIComponent(jobId));
+      if (!resp.ok) {
+        statusEl.className = 'run-status';
+        statusEl.textContent = '완료 (지난 실행 기록)';
+        state.status = 'done';
+        persist(true);
+        running = false;
+        return;
+      }
+      logEl.textContent = ''; // the buffer is replayed from the start
+      await pump(resp, true);
+    } catch (e) {
+      logEl.textContent += '\n[client error] ' + e.message;
+    }
+    running = false;
+  }
+
+  // Render the current step from state (restores after a refresh). A run that
+  // was still going reconnects to its live job.
   function renderFromState() {
     if (state.step === 3) {
+      if (state.status === 'running' && state.job) {
+        reconnect(state.job);
+        return;
+      }
       logEl.textContent = state.log || '';
       statusEl.className = 'run-status';
-      statusEl.textContent =
-        state.status === 'running'
-          ? '⚠ 새로고침으로 스트림이 끊겼습니다 — 컨테이너는 계속 실행 중일 수 있습니다. [다시 실행]으로 재실행하세요.'
-          : state.status === 'done'
-            ? '완료 (지난 실행 기록)'
-            : '';
+      statusEl.textContent = state.status === 'done' ? '완료 (지난 실행 기록)' : '';
       showStep(3);
       logEl.scrollTop = logEl.scrollHeight;
     } else {
@@ -214,18 +255,18 @@
     }
   }
 
-  // Switching recipe: reflect it in the URL (refresh-safe) and load that
-  // recipe's own saved state.
+  // Switching recipe (only possible on step 1): reflect it in the URL
+  // (refresh-safe), start that recipe fresh, and keep the typed task.
   recipeEl.addEventListener('change', function () {
     recipe = recipeEl.value;
     var u = new URL(location.href);
     u.searchParams.set('recipe', recipe);
     history.replaceState(null, '', u);
-    state = load(recipe) || { step: 1, task: '', log: '', status: '' };
+    state = { recipe: recipe, step: 1, task: taskEl.value, log: '', status: '', job: '' };
+    persist(true);
     syncRecipeDesc();
-    taskEl.value = state.task || (data.defaultTask || '');
     refreshCmd();
-    renderFromState();
+    showStep(1);
   });
 
   var nexts = document.querySelectorAll('[data-next]');
