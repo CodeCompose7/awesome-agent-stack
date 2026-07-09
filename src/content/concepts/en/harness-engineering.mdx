@@ -73,11 +73,11 @@ A bigger model rarely fixes the problems below — they are structural.
 
 | Common failure | Fixed by |
 | --- | --- |
-| **Runaway loops** — circling or retrying without end | [A bounded agent loop](#agent-loop) |
-| **Risky side effects** — deleted files, arbitrary network calls | [A code sandbox](#code-sandbox) |
-| **Unsafe / off-topic output** — leaked data, off-topic detours | [Guardrails](#guardrails) |
-| **Silent wrong answers** — confident, plausible falsehoods | [Evaluation · tracing](#evaluation) |
-| **"Worked yesterday"** — quiet quality drops or cost spikes after a change | [Observability](#observability) |
+| **Runaway loops** — circling or retrying without end | [[#agent-loop\|A bounded agent loop]] |
+| **Risky side effects** — deleted files, arbitrary network calls | [[#code-sandbox\|A code sandbox]] |
+| **Unsafe / off-topic output** — leaked data, off-topic detours | [[#guardrails\|Guardrails]] |
+| **Silent wrong answers** — confident, plausible falsehoods | [[#evaluation\|Evaluation · tracing]] |
+| **"Worked yesterday"** — quiet quality drops or cost spikes after a change | [[#observability\|Observability]] |
 
 Each row is solved by a layer *outside* the model, not by a smarter one — how each one works is covered in *the safety layers* below.
 
