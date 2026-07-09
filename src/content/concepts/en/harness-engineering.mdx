@@ -137,7 +137,8 @@ Each layer below guards against one of the failure modes in [Why it matters](#wh
 ### Code sandbox \{#code-sandbox}
 
 Runs model-written code in isolation, so a bad command can't touch your machine or your data. 
-Disposable runtimes spin up and tear down fast, which is what makes them the safety net behind a code-running agent — isolating **risky side effects** like deleted files or arbitrary network calls. 
+Disposable runtimes spin up and tear down fast, which is what makes them the safety net behind a code-running agent.
+It isolates **risky side effects** like deleted files or arbitrary network calls. 
 The same isolated runtime is also a verification tool: *evaluation* runs the model's code here to catch errors like a call to a nonexistent API.
 
 #### Example. Isolating side effects \{#example-isolating-side-effects}
@@ -192,7 +193,8 @@ flowchart LR
 ### Evaluation \{#evaluation}
 
 Score quality with metrics and test suites, so you know a change actually helped. 
-Run faithfulness, relevance, and correctness checks in CI instead of eyeballing, and the pipeline catches regressions before a person does — filtering out the **silent wrong answers** a model hands you with confidence. 
+Run faithfulness, relevance, and correctness checks in CI instead of eyeballing, and the pipeline catches regressions before a person does.
+It filters out the **silent wrong answers** a model hands you with confidence. 
 It doesn't take a claim at face value but picks the check that fits, and each step is logged to *observability* (tracing).
 
 #### Example. Scoring claims against a source \{#example-scoring-claims-against-a-source}
