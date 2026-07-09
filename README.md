@@ -2,8 +2,8 @@
 
 **English** | [한국어](docs/readme/README.ko.md)
 
-A curated stack of the tools and services you actually use to build **AI agents** —
-frameworks, LLM providers, vector stores, observability, and more.
+A curated stack of the tools and services you actually use to build **AI systems** —
+frameworks, LLM providers, vector stores, serving, observability, and more.
 
 Inspired by lists like [kyrolabs/awesome-agents](https://github.com/kyrolabs/awesome-agents),
 but it's **not just a flat list**:

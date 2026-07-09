@@ -2,8 +2,8 @@
 
 [English](../../README.md) | **한국어**
 
-**AI 에이전트**를 만들 때 실제로 쓰는 도구와 서비스를 모은 큐레이션 스택 —
-프레임워크, LLM 제공자, 벡터 스토어, 관측(observability) 등.
+**AI 시스템**을 만들 때 실제로 쓰는 도구와 서비스를 모은 큐레이션 스택 —
+프레임워크, LLM 제공자, 벡터 스토어, 서빙, 관측(observability) 등.
 
 [kyrolabs/awesome-agents](https://github.com/kyrolabs/awesome-agents) 같은
 목록에서 영감을 받았지만, **단순한 평면 목록이 아닙니다**:
