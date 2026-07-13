@@ -194,8 +194,8 @@ const themeClass = `aas-theme-${entry.data.theme}`;
           tocToggle?.setAttribute('aria-expanded', 'false');
         };
         if (deck.dataset.toc !== 'false' && tocRoot && tocPanel && tocToggle) {
-          const level = Math.min(3, Math.max(2, parseInt(deck.dataset.tocLevel || '2', 10)));
-          const sel = level >= 3 ? 'h2, h3' : 'h2';
+          const level = Math.min(4, Math.max(2, parseInt(deck.dataset.tocLevel || '2', 10)));
+          const sel = ['h2', 'h3', 'h4'].slice(0, level - 1).join(', ');
           const ul = document.createElement('ul');
           slides.forEach((slide, i) => {
             if (slide.hasAttribute('data-no-toc')) return;

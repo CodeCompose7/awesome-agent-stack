@@ -3,7 +3,7 @@ title: Layout sample
 description: Every slide construct in one deck — cover, default, center, columns, table, code, diagram, images, and a TOC-excluded slide
 order: 99
 theme: default
-toc_level: 3
+toc_level: 4
 # This deck is a layout showcase, so it starts with the TOC collapsed (open it
 # with ☰). Left open, the floating panel would cover the right-aligned images.
 toc_open: false
@@ -132,9 +132,17 @@ Mermaid diagrams render in the current (light/dark) theme.
 
 </Slide>
 
+<Slide class="center">
+
+## Images
+
+Image slides — placement · ratios · alignment · fill
+
+</Slide>
+
 <Slide>
 
-## Image on top, text below
+### Image on top, text below
 
 <Image src={media} alt="AI course background" class="aas-media-top" />
 
@@ -144,7 +152,7 @@ A large image on top with a short caption underneath.
 
 <Slide>
 
-## Image left, text right (50:50)
+### Image left, text right (50:50)
 
 <div class="aas-split">
 <Image src={media} alt="AI course background" />
@@ -162,7 +170,7 @@ Put the `<Image>` first and the text after inside `<div class="aas-split">` to g
 
 <Slide>
 
-## Image left, text right (30:70)
+### Image left, text right (30:70)
 
 <div class="aas-split r-30-70">
 <Image src={media} alt="AI course background" />
@@ -179,7 +187,7 @@ Good when the copy is long or the image is just supporting.
 
 <Slide>
 
-## Text left, image right (50:50)
+### Text left, image right (50:50)
 
 <div class="aas-split">
 <div>
@@ -196,7 +204,7 @@ Just swap the order — text first, `<Image>` after, and the image is on the rig
 
 <Slide>
 
-## Text left, image right (70:30)
+### Text left, image right (70:30)
 
 <div class="aas-split r-70-30">
 <div>
@@ -211,21 +219,22 @@ Just swap the order — text first, `<Image>` after, and the image is on the rig
 
 <Slide>
 
-## Image vertical alignment
-::sub[`img-top` · `img-bottom` — where the image sits when it's shorter than the text]
+### Image vertical alignment
+::sub[Where the image sits in a vertically-filled (`tall`) slide — `img-top` · `img-center` · `img-bottom`]
 
-<div class="aas-split r-30-70 img-top">
+Against a slide filled vertically, the image can sit at the top, center, or bottom. The next three slides show each.
+
+</Slide>
+
+<Slide>
+
+#### Top (img-top)
+
+<div class="aas-split tall r-30-70 img-top">
 <Image src={media} alt="AI course background" />
 <div>
 
-`img-top` pins the image to the top, `img-bottom` to the bottom (centered by default).
-
-Useful when the text column is taller than the image.
-
-- first point
-- second point
-- third point
-- fourth point
+`img-top` — in a vertically-filled slide the image sits at the **top**.
 
 </div>
 </div>
@@ -234,7 +243,37 @@ Useful when the text column is taller than the image.
 
 <Slide>
 
-## Fill (cover)
+#### Center (img-center)
+
+<div class="aas-split tall r-30-70 img-center">
+<Image src={media} alt="AI course background" />
+<div>
+
+`img-center` — the image is **vertically centered** (the default).
+
+</div>
+</div>
+
+</Slide>
+
+<Slide>
+
+#### Bottom (img-bottom)
+
+<div class="aas-split tall r-30-70 img-bottom">
+<Image src={media} alt="AI course background" />
+<div>
+
+`img-bottom` — in a vertically-filled slide the image sits at the **bottom**.
+
+</div>
+</div>
+
+</Slide>
+
+<Slide>
+
+### Fill (cover)
 ::sub[`fill` — a tall image cropped to css `cover`]
 
 <div class="aas-split fill">

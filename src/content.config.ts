@@ -194,10 +194,10 @@ const slides = defineCollection({
     // follows the site's color-scheme preference; this only picks the look.
     theme: z.enum(['default', 'simple', 'calm', 'bold']).default('default'),
     // In-deck table of contents (top-right). `toc` toggles it; `toc_level` is the
-    // deepest heading level it includes (2 = ## only, 3 = ## and ###); `toc_open`
-    // starts it expanded. Exclude a whole slide with <Slide toc={false}>.
+    // deepest heading level it includes (2 = ## only … up to 4 = ## ### ####);
+    // `toc_open` starts it expanded. Exclude a whole slide with <Slide toc={false}>.
     toc: z.boolean().default(true),
-    toc_level: z.number().int().min(2).max(3).default(2),
+    toc_level: z.number().int().min(2).max(4).default(2),
     toc_open: z.boolean().default(true),
     draft: z.boolean().default(false),
   }),
