@@ -96,26 +96,31 @@ function remarkMermaid() {
   return (/** @type {any} */ tree) => walk(tree);
 }
 
-// Markdown-native slide columns. In a slide, wrap content in a `:::cols`
-// container directive (needs remarkDirective, which runs first) and separate the
-// columns with a `---` rule:
+// Slide directives (needs remarkDirective, which runs first). Two are handled:
 //
-//   :::cols
-//   ### Left
-//   - a
-//   ---
-//   ### Right
-//   - b
-//   :::
+//   :::cols          columns, separated by `---`:
+//   ### Left           :::cols
+//   ---                ### Left
+//   ### Right          ---
+//   :::                ### Right
+//                      :::
+//   ::sub[짧은 부제]  a small subtitle line under a slide title
 //
-// Renders as <div class="cols"> with one <div> per column (the .cols grid is
-// styled in global.css). Splitting on `---` (thematicBreak) keeps the source
-// pure Markdown — no raw <div> tags.
-function remarkSlideCols() {
+// `cols` renders as <div class="cols"> (one <div> per column); `sub` renders as
+// <p class="aas-subtitle"> (styled in global.css). Crucially, any OTHER
+// directive is reclaimed back to its literal text — remark-directive parses
+// every `:name` as a directive, so without this a colon in prose ("50:50",
+// "12:00") would be silently eaten. Keeps the source pure Markdown.
+function remarkSlideDirectives() {
+  /** @param {any[]} nodes @returns {string} */
+  const inlineText = (nodes) =>
+    (nodes || []).map((n) => (n.value != null ? n.value : inlineText(n.children))).join('');
+
   /** @param {any} node */
   const walk = (node) => {
     if (!node.children) return;
-    for (const child of node.children) {
+    for (let i = 0; i < node.children.length; i++) {
+      const child = node.children[i];
       if (child.type === 'containerDirective' && child.name === 'cols') {
         /** @type {any[][]} */
         const groups = [[]];
@@ -129,8 +134,23 @@ function remarkSlideCols() {
           data: { hName: 'div' },
           children: g,
         }));
+        walk(child);
+      } else if (child.type === 'leafDirective' && child.name === 'sub') {
+        child.data = { hName: 'p', hProperties: { className: ['aas-subtitle'] } };
+        walk(child);
+      } else if (
+        child.type === 'textDirective' ||
+        child.type === 'leafDirective' ||
+        child.type === 'containerDirective'
+      ) {
+        // Unintended directive (e.g. `:50` inside "50:50") — restore its source.
+        const marker =
+          child.type === 'containerDirective' ? ':::' : child.type === 'leafDirective' ? '::' : ':';
+        const label = child.children && child.children.length ? `[${inlineText(child.children)}]` : '';
+        node.children[i] = { type: 'text', value: `${marker}${child.name || ''}${label}` };
+      } else {
+        walk(child);
       }
-      walk(child);
     }
   };
   return (/** @type {any} */ tree) => walk(tree);
@@ -309,7 +329,7 @@ export default defineConfig({
   // Open external links in Markdown/MDX bodies in a new tab. Internal links
   // (no protocol) are left alone, so in-site navigation stays in the same tab.
   markdown: {
-    remarkPlugins: [remarkHeadingIds, remarkMermaid, remarkDirective, remarkSlideCols, remarkGlossary],
+    remarkPlugins: [remarkHeadingIds, remarkMermaid, remarkDirective, remarkSlideDirectives, remarkGlossary],
     rehypePlugins: [
       rehypeSlug,
       rehypeHeadingAnchors,
