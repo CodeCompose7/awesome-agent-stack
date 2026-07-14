@@ -1352,9 +1352,6 @@ summary {
 .aas-slide-inner .aas-split > pre:not(.mermaid) {
   font-size: clamp(0.72rem, 1.05vw, 0.95rem);
 }
-.aas-slide-inner .aas-split pre.mermaid svg {
-  max-height: 46vh;
-}
 /* Media vertical alignment within the split (default: centered). Pair with
    `tall` (below) so top / center / bottom are measured against a full-height
    slide, not just the text column. Works for images, diagrams, and code. */
@@ -1382,6 +1379,55 @@ summary {
 .aas-slide-inner .aas-split > div > :first-child {
   margin-top: 0;
 }
+
+/* --- Code / diagram slides fill the slide vertically --------------------- */
+/* A diagram (wrapped in .aas-diagram) or code block (a bare <pre>) — in a split
+   or stacked on its own — grows to fill the slide height instead of being
+   stranded at the top. Diagrams center in the filled box; code stays pinned to
+   the top. Images are untouched (they keep their own `tall` / `fill` above). */
+
+/* 1) The slide body becomes a full-height column whenever it holds a diagram or
+      code block (directly, or as one side of a split — but not an image split). */
+.aas-slide-inner:has(> .aas-diagram),
+.aas-slide-inner:has(> pre),
+.aas-slide-inner:has(> .aas-split > .aas-diagram),
+.aas-slide-inner:has(> .aas-split > pre) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+/* 2) The media region (a standalone diagram/pre, or the split holding one) takes
+      the leftover height; drop the height cap so flex-grow can actually fill. */
+.aas-slide-inner > .aas-diagram,
+.aas-slide-inner > pre,
+.aas-slide-inner > .aas-split:has(> .aas-diagram),
+.aas-slide-inner > .aas-split:has(> pre) {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.aas-slide-inner > pre {
+  max-height: none;
+}
+/* 3) In a split, the media cell stretches to the full height (the box fills);
+      the text column stays vertically centered (.aas-split align-items: center). */
+.aas-slide-inner > .aas-split:has(> .aas-diagram) > .aas-diagram,
+.aas-slide-inner > .aas-split:has(> pre) > pre {
+  align-self: stretch;
+  height: 100%;
+}
+.aas-slide-inner > .aas-split:has(> pre) > pre {
+  max-height: none;
+}
+/* 3a) Diagram: the bordered box becomes a centering column, so the rendered
+       diagram sits in the vertical middle of the filled box. */
+.aas-slide-inner .aas-diagram {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+/* 3b) Code stays pinned to the top of its filled box — that's the default block
+       flow of a tall <pre>, so nothing extra is needed. */
+
 /* Stack image + text on narrow screens (screen only — print keeps them side by
    side regardless of the page width). */
 @media screen and (max-width: 48rem) {
@@ -1532,6 +1578,25 @@ summary {
 .aas-deck-menu-panel button svg {
   color: var(--aas-muted);
   flex: none;
+}
+/* Divider between the actions and the theme options. */
+.aas-deck-menu-sep {
+  height: 1px;
+  margin: 0.35rem 0.3rem;
+  background: var(--aas-border);
+}
+/* Theme options: check mark on the right of the active one. */
+.aas-deck-menu-check {
+  margin-left: auto;
+  color: var(--aas-accent, var(--aas-text));
+  opacity: 0;
+}
+.aas-deck-menu-panel button[data-theme-option][aria-pressed='true'] {
+  color: var(--aas-text);
+  font-weight: 600;
+}
+.aas-deck-menu-panel button[data-theme-option][aria-pressed='true'] .aas-deck-menu-check {
+  opacity: 1;
 }
 /* The handle/tab — attached to the panel's right edge. */
 .aas-deck-menu-tab {
