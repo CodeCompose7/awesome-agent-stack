@@ -1597,9 +1597,14 @@ summary {
   min-width: 100%;
   min-height: 100%;
 }
+/* Holds the transform-scaled diagram at its scaled size (so scroll/centre work). */
+.aas-zoom-scalebox {
+  flex: none;
+}
 .aas-zoom-stage svg {
   max-width: none !important;
   flex: none;
+  display: block;
 }
 .aas-zoom-stage img {
   max-width: 100%;

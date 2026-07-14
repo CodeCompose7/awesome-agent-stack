@@ -450,6 +450,7 @@ const themeClass = `aas-theme-${entry.data.theme}`;
               : media;
             const clone = source.cloneNode(true) as HTMLElement;
             clone.querySelectorAll?.('.aas-zoom-btn').forEach((b) => b.remove());
+            let content: HTMLElement = clone;
             if (clone.tagName?.toLowerCase() === 'svg') {
               // The pastel node styling is scoped to `.mermaid …`; tag the clone
               // so it keeps that look outside the slide.
@@ -464,18 +465,30 @@ const themeClass = `aas-theme-${entry.data.theme}`;
               const stageH = window.innerHeight * 0.86;
               const fit = Math.min(stageW / nW, stageH / nH);
               const scale = fit >= 1 ? Math.min(fit, 2.4) : 1;
-              clone.style.width = `${Math.round(nW * scale)}px`;
-              clone.style.height = `${Math.round(nH * scale)}px`;
+              // Enlarge with a CSS transform on the natural-size svg (not by
+              // resizing width/height) so the node shapes and their labels scale
+              // together — resizing the svg shifts Mermaid's labels off-centre.
+              clone.style.width = `${nW}px`;
+              clone.style.height = `${nH}px`;
               clone.style.maxWidth = 'none';
               clone.style.maxHeight = 'none';
+              clone.style.transform = `scale(${scale})`;
+              clone.style.transformOrigin = 'top left';
+              // A box the size of the scaled diagram, so the stage scrolls/centres it.
+              const box = document.createElement('div');
+              box.className = 'aas-zoom-scalebox';
+              box.style.width = `${Math.round(nW * scale)}px`;
+              box.style.height = `${Math.round(nH * scale)}px`;
+              box.appendChild(clone);
+              content = box;
             }
             // A centering wrapper: it's at least the stage size (so a small
             // diagram/image is centred both ways) and grows with the content (so
             // a big diagram scrolls). Reliable, unlike flex `margin:auto`.
-            const fit = document.createElement('div');
-            fit.className = 'aas-zoom-fit';
-            fit.appendChild(clone);
-            zoomStage.replaceChildren(fit);
+            const fitWrap = document.createElement('div');
+            fitWrap.className = 'aas-zoom-fit';
+            fitWrap.appendChild(content);
+            zoomStage.replaceChildren(fitWrap);
             zoom.hidden = false;
             requestAnimationFrame(() => {
               zoom.classList.add('is-open');
