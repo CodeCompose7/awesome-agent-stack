@@ -1139,7 +1139,7 @@ summary {
   margin: 0 0 0.6em;
 }
 .aas-slide-inner h2 {
-  font-size: clamp(1.5rem, 3.6vw, 2.5rem);
+  font-size: clamp(1.9rem, 4.2vw, 3rem);
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.015em;
@@ -1151,7 +1151,7 @@ summary {
    shrinking the on-slide title. (Nested ### inside :::cols keep their small size.) */
 .aas-slide-inner > h3:first-child,
 .aas-slide-inner > h4:first-child {
-  font-size: clamp(1.5rem, 3.6vw, 2.5rem);
+  font-size: clamp(1.9rem, 4.2vw, 3rem);
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.015em;
@@ -1161,8 +1161,8 @@ summary {
 
 /* Subtitle (`::sub[…]`): a small, muted line tucked under the slide title. */
 .aas-slide-inner .aas-subtitle {
-  margin: -0.4em 0 0.9em;
-  font-size: clamp(0.95rem, 1.7vw, 1.35rem);
+  margin: -0.3em 0 0.9em;
+  font-size: clamp(1.1rem, 2vw, 1.55rem);
   font-weight: 400;
   line-height: 1.4;
   color: var(--aas-muted);
@@ -1172,13 +1172,13 @@ summary {
   margin-top: -0.2em;
 }
 .aas-slide-inner h3 {
-  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+  font-size: clamp(1.3rem, 2.5vw, 1.85rem);
   font-weight: 700;
   margin: 1.2em 0 0.4em;
 }
 .aas-slide-inner p,
 .aas-slide-inner li {
-  font-size: clamp(1rem, 1.7vw, 1.4rem);
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
   line-height: 1.55;
 }
 .aas-slide-inner p {
@@ -1192,13 +1192,27 @@ summary {
   color: var(--aas-muted);
   font-style: normal;
 }
+/* Restore list markers (the site's CSS reset strips them). */
 .aas-slide-inner ul,
 .aas-slide-inner ol {
   margin: 0.4em 0 0.8em;
-  padding-left: 1.4em;
+  padding-left: 1.5em;
+}
+.aas-slide-inner ul {
+  list-style: disc;
+}
+.aas-slide-inner ul ul {
+  list-style: circle;
+}
+.aas-slide-inner ol {
+  list-style: decimal;
+}
+.aas-slide-inner ol ol {
+  list-style: lower-alpha;
 }
 .aas-slide-inner li {
   margin: 0.35em 0;
+  padding-left: 0.2em;
 }
 .aas-slide-inner li::marker {
   color: var(--aas-accent);
@@ -1432,35 +1446,37 @@ summary {
    the top. Images are untouched (they keep their own `tall` / `fill` above). */
 
 /* 1) The slide body becomes a full-height column whenever it holds a diagram or
-      code block (directly, or as one side of a split — but not an image split). */
-.aas-slide-inner:has(> .aas-diagram),
-.aas-slide-inner:has(> pre),
-.aas-slide-inner:has(> .aas-split > .aas-diagram),
-.aas-slide-inner:has(> .aas-split > pre) {
+      code block (directly, or as one side of a split — but not an image split).
+      A slide marked `compact` opts out: the media keeps its natural size (padded)
+      and the text flows normally, leaving room for longer copy. */
+.aas-slide:not(.compact) .aas-slide-inner:has(> .aas-diagram),
+.aas-slide:not(.compact) .aas-slide-inner:has(> pre),
+.aas-slide:not(.compact) .aas-slide-inner:has(> .aas-split > .aas-diagram),
+.aas-slide:not(.compact) .aas-slide-inner:has(> .aas-split > pre) {
   display: flex;
   flex-direction: column;
   min-height: 100%;
 }
 /* 2) The media region (a standalone diagram/pre, or the split holding one) takes
       the leftover height; drop the height cap so flex-grow can actually fill. */
-.aas-slide-inner > .aas-diagram,
-.aas-slide-inner > pre,
-.aas-slide-inner > .aas-split:has(> .aas-diagram),
-.aas-slide-inner > .aas-split:has(> pre) {
+.aas-slide:not(.compact) .aas-slide-inner > .aas-diagram,
+.aas-slide:not(.compact) .aas-slide-inner > pre,
+.aas-slide:not(.compact) .aas-slide-inner > .aas-split:has(> .aas-diagram),
+.aas-slide:not(.compact) .aas-slide-inner > .aas-split:has(> pre) {
   flex: 1 1 auto;
   min-height: 0;
 }
-.aas-slide-inner > pre {
+.aas-slide:not(.compact) .aas-slide-inner > pre {
   max-height: none;
 }
 /* 3) In a split, the media cell stretches to the full height (the box fills);
       the text column stays vertically centered (.aas-split align-items: center). */
-.aas-slide-inner > .aas-split:has(> .aas-diagram) > .aas-diagram,
-.aas-slide-inner > .aas-split:has(> pre) > pre {
+.aas-slide:not(.compact) .aas-slide-inner > .aas-split:has(> .aas-diagram) > .aas-diagram,
+.aas-slide:not(.compact) .aas-slide-inner > .aas-split:has(> pre) > pre {
   align-self: stretch;
   height: 100%;
 }
-.aas-slide-inner > .aas-split:has(> pre) > pre {
+.aas-slide:not(.compact) .aas-slide-inner > .aas-split:has(> pre) > pre {
   max-height: none;
 }
 /* 3a) Diagram: the bordered box becomes a centering column, so the rendered

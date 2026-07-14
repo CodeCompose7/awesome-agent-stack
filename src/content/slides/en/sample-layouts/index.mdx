@@ -53,6 +53,32 @@ Every slide layout and element in one deck
 
 </Slide>
 
+<Slide>
+
+## Bullet points
+
+- The most common slide shape — one key point per line
+- Keep items short and parallel
+  - Add supporting detail as a sub-item
+  - Indent one more level if needed
+- Emphasize keywords in **bold**
+- Close with the final point
+
+</Slide>
+
+<Slide>
+
+## Numbered steps
+
+1. **Collect** — gather the material and data you need
+2. **Clean** — normalize the format, drop the noise
+3. **Arrange** — lay it out to match the slide flow
+4. **Review** — fold in feedback and refine
+
+Use this when order matters — steps and procedures.
+
+</Slide>
+
 <Slide class="center">
 
 ## Center layout
@@ -98,6 +124,7 @@ Good for a short emphasis slide or a section divider.
 | align/fill | `img-top`·`fill` | vertical position · cover |
 | subtitle | `::sub[…]` | small, under the title |
 | source | `source="…"` | bottom-right, ≤2 lines |
+| compact | `class="compact"` | natural diagram + long text |
 | TOC-excluded | `toc={false}` | heading hidden |
 
 Tables use standard Markdown syntax. Hover a diagram or image for an **Enlarge** button (top-right).
@@ -429,6 +456,26 @@ flowchart LR
 ```
 
 Put the diagram first and the caption underneath — no split, it just stacks.
+
+</Slide>
+
+<Slide class="compact">
+
+### Diagram + long text (compact)
+::sub[`class="compact"` — the diagram keeps its natural size (just padded) and the text flows below]
+
+```mermaid
+flowchart LR
+  a[Collect] --> b[Clean] --> c[Train] --> d[Evaluate]
+```
+
+A normal diagram slide fills the height, but `<Slide class="compact">` keeps the diagram at its **natural size** so you can write a longer explanation underneath.
+
+- when you walk through each pipeline stage in prose
+- when the diagram is a reference and the text carries the point
+- when you need several paragraphs
+
+Adding paragraphs like this doesn't push the diagram up — it stays put, with just a little padding around the box.
 
 </Slide>
 
