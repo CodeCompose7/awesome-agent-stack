@@ -1566,9 +1566,9 @@ summary {
   justify-content: center;
   padding: clamp(1.5rem, 5vh, 4rem);
   /* Match the deck: light backdrop in light mode, dark in dark mode (a diagram's
-     pastel nodes read the same as they do on the slide). Near-opaque so the
-     slide behind doesn't bleed through. */
-  background: color-mix(in srgb, var(--aas-bg) 95%, transparent);
+     pastel nodes read the same as they do on the slide). Opaque so the slide
+     behind — its own diagram/text — doesn't ghost through under the enlarged one. */
+  background: var(--aas-bg);
   opacity: 0;
   transition: opacity 0.2s ease;
   cursor: zoom-out;
