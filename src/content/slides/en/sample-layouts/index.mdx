@@ -603,6 +603,54 @@ The diagram is long, so it scrolls vertically inside its column. Click it to enl
 
 </Slide>
 
+<Slide>
+
+### Scroll walkthrough
+::sub[Press → and the flowchart on the left scrolls to that spot while the notes on the right change]
+
+<div class="aas-split scroll">
+
+```mermaid
+flowchart TD
+  A[User request] --> B{Validate input}
+  B -->|valid| C[Classify intent]
+  B -->|invalid| Z[Return error]
+  C --> D{Tool needed?}
+  D -->|yes| E[Select tool]
+  D -->|no| F[Answer directly]
+  E --> G[Run tool]
+  G --> H{Success?}
+  H -->|yes| I[Merge result]
+  H -->|no| J[Retry / fallback]
+  J --> G
+  I --> K[Generate response]
+  F --> K
+  K --> L[Output to user]
+```
+
+<div>
+
+:::step{scroll=0}
+**① Validate** — check the request is valid, else return an error right away.
+:::
+
+:::step{scroll=35}
+**② Decide** — classify the intent and decide whether a tool is needed.
+:::
+
+:::step{scroll=72}
+**③ Run & check** — run the tool; on success merge the result, on failure retry / fall back.
+:::
+
+:::step{scroll=100}
+**④ Output** — generate the response and hand it to the user.
+:::
+
+</div>
+</div>
+
+</Slide>
+
 <Slide class="compact">
 
 ### Diagram + long text (compact)

@@ -1868,6 +1868,24 @@ summary {
   transform: translateY(0.4em);
 }
 
+/* Walkthrough steps (`:::step{scroll=…}`): the block-level step gets some room,
+   and while stepping the non-active ones dim so the current one leads the eye
+   (paired with the diagram scrolling to the step's spot). */
+.aas-slide-inner .aas-step[data-scroll] {
+  margin: 0 0 0.9em;
+  padding-left: 0.9em;
+  border-left: 3px solid transparent;
+}
+.aas-slide-inner .aas-step[data-scroll] > :first-child {
+  margin-top: 0;
+}
+.aas-slide-inner .aas-step[data-scroll]:not(.is-step-hidden):not(.is-step-active) {
+  opacity: 0.4;
+}
+.aas-slide-inner .aas-step[data-scroll].is-step-active {
+  border-left-color: var(--aas-accent);
+}
+
 /* --- Visual themes ------------------------------------------------------- */
 /* Picked per deck via `theme:` in frontmatter (adds .aas-theme-<name> to the
    deck). They restyle slide typography only; light/dark still follows the site.
