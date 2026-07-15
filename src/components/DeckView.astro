@@ -161,21 +161,32 @@ const themeClass = `aas-theme-${entry.data.theme}`;
         const slideSteps = slides.map((s) =>
           Array.from(s.querySelectorAll<HTMLElement>('.aas-step')),
         );
-        // The scroll container a walkthrough drives (the scrollable diagram).
+        // The scroll container a walkthrough drives (the scrollable diagram —
+        // vertical in a `scroll` split, horizontal in a `scroll-x` slide).
         const stepScroller = slides.map(
-          (s) => s.querySelector<HTMLElement>('.aas-split.scroll > .aas-diagram, [data-scroll-container]'),
+          (s) =>
+            s.querySelector<HTMLElement>('.aas-split.scroll > .aas-diagram, [data-scroll-container]') ||
+            (s.classList.contains('scroll-x') ? s.querySelector<HTMLElement>('.aas-diagram') : null),
         );
         const shown = slides.map(() => 0);
         // If the active step carries `data-scroll`, scroll the slide's container
-        // to that spot (`N` = N% of the scrollable height, or `Npx`).
+        // to that spot (`N` = N% of the scrollable length, or `Npx`). The axis is
+        // whichever one actually overflows.
         const syncStepScroll = (i: number) => {
           const el = slideSteps[i][shown[i] - 1];
           const scroller = stepScroller[i];
           if (!el || !scroller || el.dataset.scroll == null) return;
           const raw = el.dataset.scroll;
-          const max = scroller.scrollHeight - scroller.clientHeight;
-          const top = /px$/.test(raw) ? parseFloat(raw) : (parseFloat(raw) / 100) * max;
-          scroller.scrollTo({ top, behavior: animate ? 'smooth' : 'auto' });
+          const maxX = scroller.scrollWidth - scroller.clientWidth;
+          const maxY = scroller.scrollHeight - scroller.clientHeight;
+          const behavior: ScrollBehavior = animate ? 'smooth' : 'auto';
+          if (maxX > maxY) {
+            const left = /px$/.test(raw) ? parseFloat(raw) : (parseFloat(raw) / 100) * maxX;
+            scroller.scrollTo({ left, behavior });
+          } else {
+            const top = /px$/.test(raw) ? parseFloat(raw) : (parseFloat(raw) / 100) * maxY;
+            scroller.scrollTo({ top, behavior });
+          }
         };
         const applySteps = (i: number) => {
           slideSteps[i].forEach((el, k) => {

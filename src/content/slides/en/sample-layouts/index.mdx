@@ -689,6 +689,34 @@ A flowchart with many stages runs wide; shrinking it to fit makes the labels tin
 
 </Slide>
 
+<Slide class="compact scroll-x">
+
+### Horizontal scroll walkthrough
+::sub[Press → and the pipeline above **scrolls sideways** to that stage while the note below changes]
+
+```mermaid
+flowchart LR
+  a[Collect] --> b[Clean] --> c[Label] --> d[Extract features] --> e[Train] --> f[Cross-validate] --> g[Evaluate] --> h[Tune] --> i[Deploy] --> j[Monitor]
+```
+
+:::step{scroll=0}
+**① Prepare data** — collect, clean, and label to build the training set.
+:::
+
+:::step{scroll=42}
+**② Train** — extract features and train the model.
+:::
+
+:::step{scroll=72}
+**③ Evaluate** — cross-validate and evaluate, then tune.
+:::
+
+:::step{scroll=100}
+**④ Operate** — deploy, monitor, and retrain when needed.
+:::
+
+</Slide>
+
 <Slide toc={false}>
 
 ## This heading is not in the TOC
