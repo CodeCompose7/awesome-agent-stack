@@ -1452,7 +1452,7 @@ summary {
       and the text flows normally, leaving room for longer copy. */
 .aas-slide:not(.compact) .aas-slide-inner:has(> .aas-diagram),
 .aas-slide:not(.compact) .aas-slide-inner:has(> pre),
-.aas-slide:not(.compact) .aas-slide-inner:has(> .aas-split > .aas-diagram),
+.aas-slide:not(.compact) .aas-slide-inner:has(> .aas-split:not(.scroll) > .aas-diagram),
 .aas-slide:not(.compact) .aas-slide-inner:has(> .aas-split > pre) {
   display: flex;
   flex-direction: column;
@@ -1462,7 +1462,7 @@ summary {
       the leftover height; drop the height cap so flex-grow can actually fill. */
 .aas-slide:not(.compact) .aas-slide-inner > .aas-diagram,
 .aas-slide:not(.compact) .aas-slide-inner > pre,
-.aas-slide:not(.compact) .aas-slide-inner > .aas-split:has(> .aas-diagram),
+.aas-slide:not(.compact) .aas-slide-inner > .aas-split:not(.scroll):has(> .aas-diagram),
 .aas-slide:not(.compact) .aas-slide-inner > .aas-split:has(> pre) {
   flex: 1 1 auto;
   min-height: 0;
@@ -1472,7 +1472,7 @@ summary {
 }
 /* 3) In a split, the media cell stretches to the full height (the box fills);
       the text column stays vertically centered (.aas-split align-items: center). */
-.aas-slide:not(.compact) .aas-slide-inner > .aas-split:has(> .aas-diagram) > .aas-diagram,
+.aas-slide:not(.compact) .aas-slide-inner > .aas-split:not(.scroll):has(> .aas-diagram) > .aas-diagram,
 .aas-slide:not(.compact) .aas-slide-inner > .aas-split:has(> pre) > pre {
   align-self: stretch;
   height: 100%;
@@ -1491,6 +1491,31 @@ summary {
 }
 /* 3b) Code stays pinned to the top of its filled box — that's the default block
        flow of a tall <pre>, so nothing extra is needed. */
+
+/* Scrollable diagram (`<div class="aas-split scroll">`): the diagram column is a
+   fixed-height scroll box (opted out of the fill rules above) and the diagram
+   fits the column width, so a tall/complex flowchart scrolls vertically next to
+   its explanation instead of shrinking to fit. Click the diagram to enlarge. */
+.aas-slide-inner .aas-split.scroll > .aas-diagram {
+  display: block;
+  align-self: start;
+  height: min(64vh, 34rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+/* The inner <pre.mermaid> otherwise caps itself at 62vh and scrolls on its own,
+   creating a nested scroll box; unclamp it so .aas-diagram is the sole scroller. */
+.aas-slide-inner .aas-split.scroll > .aas-diagram .mermaid {
+  display: block;
+  max-height: none;
+  overflow: visible;
+}
+.aas-slide-inner .aas-split.scroll > .aas-diagram svg {
+  width: 100%;
+  max-width: 100%;
+  max-height: none;
+  height: auto;
+}
 
 /* --- Per-slide source / citation (bottom-right, ≤2 lines) ---------------- */
 .aas-slide-source {

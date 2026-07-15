@@ -205,7 +205,7 @@ Good for a short emphasis slide or a section divider.
 | steps · compact | `:::steps` · `class="compact"` | reveal one-by-one · natural size |
 | TOC-excluded | `toc={false}` | heading hidden |
 
-Tables use standard Markdown syntax. Hover a diagram or image for an **Enlarge** button, and press `o` for an overview of every slide.
+Tables use standard Markdown syntax. Hover a diagram or image for an **Enlarge** button, and press `o` for an overview of every slide. A long diagram scrolls inside its column with `aas-split scroll`.
 
 </Slide>
 
@@ -559,6 +559,47 @@ flowchart TD
   F --> K
   K --> L[Output to user]
 ```
+
+</Slide>
+
+<Slide>
+
+### Complex flowchart + notes
+::sub[`aas-split scroll` — the diagram on the left scrolls vertically inside its column]
+
+<div class="aas-split scroll">
+
+```mermaid
+flowchart TD
+  A[User request] --> B{Validate input}
+  B -->|valid| C[Classify intent]
+  B -->|invalid| Z[Return error]
+  C --> D{Tool needed?}
+  D -->|yes| E[Select tool]
+  D -->|no| F[Answer directly]
+  E --> G[Run tool]
+  G --> H{Success?}
+  H -->|yes| I[Merge result]
+  H -->|no| J[Retry / fallback]
+  J --> G
+  I --> K[Generate response]
+  F --> K
+  K --> L[Output to user]
+```
+
+<div>
+
+How the agent handles a request.
+
+1. **Validate input** — invalid requests return an error immediately
+2. **Classify intent → decide if a tool is needed**
+3. If so, **select → run → check success**, retry / fall back on failure
+4. Merge the result or answer directly, then **output**
+
+The diagram is long, so it scrolls vertically inside its column. Click it to enlarge.
+
+</div>
+</div>
 
 </Slide>
 
