@@ -92,14 +92,14 @@ This repo is a **pnpm workspace**: everything site-agnostic (routes, components,
 styles, the markdown pipeline, content schemas) lives in the
 [`stack-site-builder`](packages/stack-site-builder/) theme package, and each catalog site
 is a thin consumer under `sites/` that supplies only content, taxonomy data and
-a small config. [`sites/ai-stack/`](sites/ai-stack/) is this site;
-[`sites/ai-image-stack/`](sites/ai-image-stack/) is a second catalog built on
-the same theme. The endgame is to publish the theme to npm and split each site
-into its own repo — the workspace is the workbench where the theme's boundary
-gets stabilized first.
+a small config. [`sites/awesome-ai-stack/`](sites/awesome-ai-stack/) is this
+site; further catalogs (e.g. an AI-image stack) are added the same way — a thin
+folder under `sites/`. The endgame is to publish the theme to npm and split
+each site into its own repo — the workspace is the workbench where the theme's
+boundary gets stabilized first.
 
-Root scripts target the main site (`pnpm dev` / `pnpm build`); use
-`pnpm --filter ai-image-stack dev` for another site, or `pnpm -r build` for all.
+Root scripts target the main site (`pnpm dev` / `pnpm build`);
+`pnpm -r build` builds every site in the workspace.
 
 ## Project structure
 
@@ -118,7 +118,7 @@ packages/stack-site-builder/                  # stack-site-builder — the theme
    ├─ pages/                    # every route (EN at root + /ko mirrors), injected into sites
    └─ styles/global.css         # Tailwind import + Markdown/prose + slide styles
 
-sites/ai-stack/                 # THIS site — content and config only
+sites/awesome-ai-stack/                 # THIS site — content and config only
 ├─ astro.config.mjs             # site/base/i18n + aasTheme({ glossary })
 ├─ src/content.config.ts        # one call: defineAasCollections({ categoryMap })
 ├─ src/content/
@@ -135,18 +135,17 @@ sites/ai-stack/                 # THIS site — content and config only
 ├─ public/logos/                # tool logos
 └─ samples/                     # runnable mini-projects (Implementation tabs)
 
-sites/ai-image-stack/           # a second catalog site — same shape, its own content
 ```
 
 ## Internationalization (EN / KO)
 
 The site is bilingual. `en` is the default locale (served at the root) and `ko`
 is served under `/ko/` — configured via Astro's `i18n` in
-[`sites/ai-stack/astro.config.mjs`](sites/ai-stack/astro.config.mjs). A language toggle in the header links to
+[`sites/awesome-ai-stack/astro.config.mjs`](sites/awesome-ai-stack/astro.config.mjs). A language toggle in the header links to
 the same page in the other locale.
 
 - **UI strings** live in [`src/i18n/ui.ts`](packages/stack-site-builder/src/i18n/ui.ts) (the `ui` dictionary).
-- **Category labels** are per-locale in [`src/data/categories.ts`](sites/ai-stack/src/data/categories.ts)
+- **Category labels** are per-locale in [`src/data/categories.ts`](sites/awesome-ai-stack/src/data/categories.ts)
   (and the concept/article taxonomies alongside it).
 - **Content** is one MDX file per locale: `content/<collection>/en/<slug>.mdx`
   and `content/<collection>/ko/<slug>.mdx`. Keep the **same slug** in both so the
@@ -181,7 +180,7 @@ Detail pages also render a sticky right-rail **table of contents** (h2–h3, fro
 
 Beyond the illustrative code samples, a tool can ship one or more **real,
 runnable mini-projects** as standalone folders under `samples/` (source, a
-`Dockerfile`, and a README — e.g. [`samples/langgraph_1/`](sites/ai-stack/samples/langgraph_1/)).
+`Dockerfile`, and a README — e.g. [`samples/langgraph_1/`](sites/awesome-ai-stack/samples/langgraph_1/)).
 List them in frontmatter — a bare folder name, or an object that also names the
 other catalog tools the project uses:
 
@@ -234,7 +233,7 @@ lives in [`src/lib/github.ts`](packages/stack-site-builder/src/lib/github.ts) (m
 Prose in any collection can link a term with `[[Term]]` (or
 `[[Term|display text]]`). The `remarkGlossary` plugin in
 [`astro.config.mjs`](astro.config.mjs) resolves each marker against the central
-glossary ([`src/data/glossary.mjs`](sites/ai-stack/src/data/glossary.mjs)) at build time:
+glossary ([`src/data/glossary.mjs`](sites/awesome-ai-stack/src/data/glossary.mjs)) at build time:
 
 - A term targets a **stack**, a **concept**, an external **href**, or nothing —
   a definition-only term, which links to its entry on the `/glossary/` page.
@@ -279,8 +278,8 @@ link back.
 
 ## Adding a tool
 
-Drop one MDX file per locale into `sites/ai-stack/src/content/stacks/en/` and
-`sites/ai-stack/src/content/stacks/ko/` (use the **same filename** in both). The filename
+Drop one MDX file per locale into `sites/awesome-ai-stack/src/content/stacks/en/` and
+`sites/awesome-ai-stack/src/content/stacks/ko/` (use the **same filename** in both). The filename
 becomes the URL slug (`langgraph.mdx` → `/stack/langgraph/` and
 `/ko/stack/langgraph/`).
 
@@ -323,7 +322,7 @@ when you need it: `formerNames`, `pricingTiers`/`pricingNote`/`pricingSource`,
 `projects` fields described above.
 
 To add a **new category**, add a node to the tree in
-[`src/data/categories.ts`](sites/ai-stack/src/data/categories.ts) — top-level or nested under
+[`src/data/categories.ts`](sites/awesome-ai-stack/src/data/categories.ts) — top-level or nested under
 `children`; ids must be unique across the whole tree. Homepage sections render
 in top-level order.
 
@@ -332,7 +331,7 @@ in top-level order.
 Pushing to `main` triggers [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml),
 which builds with Astro and publishes to GitHub Pages (it also runs on a daily
 cron to refresh the live GitHub stats). The `site` and `base` are configured in
-[`sites/ai-stack/astro.config.mjs`](sites/ai-stack/astro.config.mjs) for a GitHub project page; to use a
+[`sites/awesome-ai-stack/astro.config.mjs`](sites/awesome-ai-stack/astro.config.mjs) for a GitHub project page; to use a
 custom domain, set `site` to the domain, `base` to `'/'`, and add `public/CNAME`.
 
 ## Contributing

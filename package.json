@@ -7,9 +7,9 @@
     "node": ">=20.3.0"
   },
   "scripts": {
-    "dev": "pnpm --filter ai-stack dev",
-    "build": "pnpm --filter ai-stack build",
-    "preview": "pnpm --filter ai-stack preview",
+    "dev": "pnpm --filter awesome-ai-stack dev",
+    "build": "pnpm --filter awesome-ai-stack build",
+    "preview": "pnpm --filter awesome-ai-stack preview",
     "check": "pnpm -r check",
     "build:all": "pnpm -r build"
   }
