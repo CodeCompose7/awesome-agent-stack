@@ -1,7 +1,7 @@
 {
-  "name": "@awesome-ai-stack/core",
+  "name": "stack-site-builder",
   "type": "module",
-  "version": "0.1.0",
+  "version": "1.10.0",
   "private": true,
   "description": "The engine behind the awesome-*-stack catalog sites: an Astro theme with the catalog/concepts/articles/slides/samples routes, components, styles and markdown pipeline. Sites provide content, taxonomy data and config.",
   "exports": {

@@ -1,4 +1,4 @@
-import { defineAasCollections } from '@awesome-ai-stack/core/content';
+import { defineAasCollections } from 'stack-site-builder/content';
 import { categoryMap } from './data/categories';
 
 // The content model (stacks / articles / concepts / slides) comes from the

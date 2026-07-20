@@ -1,7 +1,7 @@
 // @ts-check
 // The awesome-*-stack theme. A site's astro.config.mjs stays tiny:
 //
-//   import aasTheme from '@awesome-ai-stack/core';
+//   import aasTheme from 'stack-site-builder';
 //   import { glossary } from './src/data/glossary.mjs';
 //   export default defineConfig({
 //     site: '…', base: '/…', i18n: { … },
@@ -60,7 +60,7 @@ function patternOf(file, prefix) {
 export default function aasTheme({ glossary }) {
   /** @type {import('astro').AstroIntegration} */
   const core = {
-    name: '@awesome-ai-stack/core',
+    name: 'stack-site-builder',
     hooks: {
       'astro:config:setup': ({ config, injectRoute, updateConfig }) => {
         for (const prefix of ['', 'ko/']) {
@@ -68,7 +68,7 @@ export default function aasTheme({ glossary }) {
             const entry = prefix === '' ? file : `ko/${file}`;
             injectRoute({
               pattern: patternOf(file, prefix),
-              entrypoint: `@awesome-ai-stack/core/pages/${entry}`,
+              entrypoint: `stack-site-builder/pages/${entry}`,
             });
           }
         }

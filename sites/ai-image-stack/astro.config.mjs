@@ -1,8 +1,8 @@
 // @ts-check
 // Site-level config only — routes, components, markdown pipeline and styling
-// all come from the @awesome-ai-stack/core theme. See packages/core/index.mjs.
+// all come from the stack-site-builder theme. See packages/stack-site-builder/index.mjs.
 import { defineConfig } from 'astro/config';
-import aasTheme from '@awesome-ai-stack/core';
+import aasTheme from 'stack-site-builder';
 import { glossary } from './src/data/glossary.mjs';
 
 // https://astro.build/config

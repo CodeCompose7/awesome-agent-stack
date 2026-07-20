@@ -2,7 +2,7 @@
   "extends": "astro/tsconfigs/strict",
   // The theme's sources are included so `astro check` covers them against
   // THIS site's generated content types and data modules.
-  "include": [".astro/types.d.ts", "**/*", "../../packages/core/src/**/*"],
+  "include": [".astro/types.d.ts", "**/*", "../../packages/stack-site-builder/src/**/*"],
   "exclude": ["dist"],
   "compilerOptions": {
     "baseUrl": ".",

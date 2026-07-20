@@ -20,7 +20,7 @@
 | 변경 이력 | [`CHANGELOG.md`](../CHANGELOG.md) | 맨 위에 새 섹션 추가(아래 형식 참고) |
 
 버전 문자열은 이 두 곳에만 있습니다. 루트 `package.json`은 버전 없는
-워크스페이스 매니페스트이고, `packages/core`와 `sites/ai-image-stack`은 각자의
+워크스페이스 매니페스트이고, `packages/stack-site-builder`와 `sites/ai-image-stack`은 각자의
 버전을 따로 갖습니다 — ai-stack 릴리스에서는 손대지 않습니다.
 
 ## CHANGELOG 작성 형식

@@ -8,7 +8,7 @@ importers:
 
   .: {}
 
-  packages/core:
+  packages/stack-site-builder:
     dependencies:
       '@astrojs/mdx':
         specifier: ^4.2.0
@@ -53,9 +53,9 @@ importers:
 
   sites/ai-image-stack:
     dependencies:
-      '@awesome-ai-stack/core':
+      'stack-site-builder':
         specifier: workspace:*
-        version: link:../../packages/core
+        version: link:../../packages/stack-site-builder
       astro:
         specifier: ^5.7.0
         version: 5.18.2(@types/node@24.13.2)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@6.0.3)(yaml@2.9.0)
@@ -72,9 +72,9 @@ importers:
 
   sites/ai-stack:
     dependencies:
-      '@awesome-ai-stack/core':
+      'stack-site-builder':
         specifier: workspace:*
-        version: link:../../packages/core
+        version: link:../../packages/stack-site-builder
       astro:
         specifier: ^5.7.0
         version: 5.18.2(@types/node@24.13.2)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.2)(typescript@6.0.3)(yaml@2.9.0)

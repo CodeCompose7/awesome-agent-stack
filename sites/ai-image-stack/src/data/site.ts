@@ -1,7 +1,7 @@
 /**
- * This site's identity, consumed by the @awesome-ai-stack/core theme via the
+ * This site's identity, consumed by the stack-site-builder theme via the
  * `@aas-data/site` alias. UI string overrides (taglines etc.) use the same
- * keys as `packages/core/src/i18n/ui.ts`.
+ * keys as `packages/stack-site-builder/src/i18n/ui.ts`.
  */
 export const site = {
   /** Shown in the header and as the homepage title. */

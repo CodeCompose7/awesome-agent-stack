@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-/* This stylesheet ships inside the @awesome-ai-stack/core package. Tailwind
+/* This stylesheet ships inside the stack-site-builder package. Tailwind
    only auto-scans the consuming site's own sources, so point it at the
-   theme's sources too — relative to this file, i.e. packages/core/src. */
+   theme's sources too — relative to this file, i.e. packages/stack-site-builder/src. */
 @source "../";
 
 /* MaruBuri (Naver) — a Korean serif that also covers Latin. Used for the

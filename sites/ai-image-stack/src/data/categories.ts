@@ -1,6 +1,6 @@
-import { buildTree, type Category } from '@awesome-ai-stack/core/lib/category-tree';
+import { buildTree, type Category } from 'stack-site-builder/lib/category-tree';
 
-export type { Category } from '@awesome-ai-stack/core/lib/category-tree';
+export type { Category } from 'stack-site-builder/lib/category-tree';
 
 /**
  * The tool-catalog taxonomy for this site: AI image generation and processing.

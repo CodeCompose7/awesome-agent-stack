@@ -1,9 +1,9 @@
 /**
- * This site's identity, consumed by the @awesome-ai-stack/core theme via the
+ * This site's identity, consumed by the stack-site-builder theme via the
  * `@aas-data/site` alias: header/home name, the GitHub repo behind "view
  * source" links and sample folder URLs, and the User-Agent for build-time
  * GitHub API calls. UI strings (taglines etc.) can be overridden per-site via
- * `ui` — keys match `packages/core/src/i18n/ui.ts`.
+ * `ui` — keys match `packages/stack-site-builder/src/i18n/ui.ts`.
  */
 export const site = {
   /** Shown in the header and as the homepage title. */

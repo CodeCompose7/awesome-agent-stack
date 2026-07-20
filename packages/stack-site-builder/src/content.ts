@@ -6,7 +6,7 @@ import { glob } from 'astro/loaders';
  * catalog), `articles`, `concepts` and `slides`. A site's content.config.ts
  * stays thin:
  *
- *   import { defineAasCollections } from '@awesome-ai-stack/core/content';
+ *   import { defineAasCollections } from 'stack-site-builder/content';
  *   import { categoryMap } from './data/categories';
  *   export const collections = defineAasCollections({ categoryMap });
  *

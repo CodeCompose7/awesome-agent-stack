@@ -1,10 +1,10 @@
 // @ts-check
 // Site-level config only: URL, base path, locales, and the site's glossary.
 // Everything else — routes, components, markdown pipeline, tailwind, the
-// dev-only local-samples middleware — comes from the @awesome-ai-stack/core
-// theme. See packages/core/index.mjs.
+// dev-only local-samples middleware — comes from the stack-site-builder
+// theme. See packages/stack-site-builder/index.mjs.
 import { defineConfig } from 'astro/config';
-import aasTheme from '@awesome-ai-stack/core';
+import aasTheme from 'stack-site-builder';
 import { glossary } from './src/data/glossary.mjs';
 
 // https://astro.build/config

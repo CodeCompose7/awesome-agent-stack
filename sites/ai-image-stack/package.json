@@ -14,7 +14,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@awesome-ai-stack/core": "workspace:*",
+    "stack-site-builder": "workspace:*",
     "astro": "^5.7.0",
     "sharp": "^0.35.2"
   },

@@ -77,7 +77,7 @@ locale-partitioned (`en/` and `ko/` subfolders, same filename in both):
 | `articles` | `<site>/src/content/articles/`     | `/article/<slug>/`    | Writing — long-form posts, kept apart from the catalog            |
 
 Frontmatter for all three is validated at build time by the Zod schemas in
-[`packages/core/src/content.ts`](packages/core/src/content.ts) — shared by every
+[`packages/stack-site-builder/src/content.ts`](packages/stack-site-builder/src/content.ts) — shared by every
 site via `defineAasCollections()`. A typo or missing required field fails
 `pnpm build` and `pnpm check`, so broken entries can't ship.
 
@@ -90,7 +90,7 @@ and `/article/category/<id>/` (their own taxonomies), `/tags/<tag>/`,
 
 This repo is a **pnpm workspace**: everything site-agnostic (routes, components,
 styles, the markdown pipeline, content schemas) lives in the
-[`@awesome-ai-stack/core`](packages/core/) theme package, and each catalog site
+[`stack-site-builder`](packages/stack-site-builder/) theme package, and each catalog site
 is a thin consumer under `sites/` that supplies only content, taxonomy data and
 a small config. [`sites/ai-stack/`](sites/ai-stack/) is this site;
 [`sites/ai-image-stack/`](sites/ai-image-stack/) is a second catalog built on
@@ -104,7 +104,7 @@ Root scripts target the main site (`pnpm dev` / `pnpm build`); use
 ## Project structure
 
 ```text
-packages/core/                  # @awesome-ai-stack/core — the theme (engine)
+packages/stack-site-builder/                  # stack-site-builder — the theme (engine)
 ├─ index.mjs                    # integration: injects every route, wires markdown/tailwind,
 │                               #   aliases @aas-data/* + @assets/* to the consuming site
 ├─ markdown.mjs                 # remark/rehype pipeline (mermaid, slides, [[wikilinks]]…)
@@ -145,7 +145,7 @@ is served under `/ko/` — configured via Astro's `i18n` in
 [`sites/ai-stack/astro.config.mjs`](sites/ai-stack/astro.config.mjs). A language toggle in the header links to
 the same page in the other locale.
 
-- **UI strings** live in [`src/i18n/ui.ts`](packages/core/src/i18n/ui.ts) (the `ui` dictionary).
+- **UI strings** live in [`src/i18n/ui.ts`](packages/stack-site-builder/src/i18n/ui.ts) (the `ui` dictionary).
 - **Category labels** are per-locale in [`src/data/categories.ts`](sites/ai-stack/src/data/categories.ts)
   (and the concept/article taxonomies alongside it).
 - **Content** is one MDX file per locale: `content/<collection>/en/<slug>.mdx`
@@ -194,8 +194,8 @@ projects:
 ```
 
 The detail page then shows an **Implementation** tab
-([`ProjectViewer`](packages/core/src/components/ProjectViewer.astro)) where, per project,
-[`src/lib/project.ts`](packages/core/src/lib/project.ts) (at build time):
+([`ProjectViewer`](packages/stack-site-builder/src/components/ProjectViewer.astro)) where, per project,
+[`src/lib/project.ts`](packages/stack-site-builder/src/lib/project.ts) (at build time):
 
 - renders the `README.md` as prose (its first `#` heading becomes the project name),
 - shows a **file tree** on the left; clicking a file shows it syntax-highlighted,
@@ -209,7 +209,7 @@ frontmatter field and `<SampleProject folder="…"/>`.
 
 - **Mermaid** diagrams work both in the Overview body (a ```mermaid fenced
   block) and per-sample via `diagram:`. They render on the client and recolor
-  with the light/dark theme ([`MermaidLoader.astro`](packages/core/src/components/MermaidLoader.astro)).
+  with the light/dark theme ([`MermaidLoader.astro`](packages/stack-site-builder/src/components/MermaidLoader.astro)).
 - Code is highlighted at **build time** with Shiki.
 - Tools without `samples` render the MDX body directly (no tabs), so adopting
   this per tool is optional and incremental.
@@ -218,7 +218,7 @@ frontmatter field and `<SampleProject folder="…"/>`.
 
 Cards and detail pages show a star count and the latest version for any tool
 with a `repo` on GitHub — **fetched at build time**, not hand-entered. The logic
-lives in [`src/lib/github.ts`](packages/core/src/lib/github.ts) (memoized per repo, cached
+lives in [`src/lib/github.ts`](packages/stack-site-builder/src/lib/github.ts) (memoized per repo, cached
 ~daily in `.aas-cache/`; degrades to the last known values on error/offline/rate-limit).
 
 - These reflect the project's real state **as of the last build**. The deploy
@@ -268,7 +268,7 @@ That single `tools` list powers links in **both** directions:
   base-independent relative path, e.g. `[Langfuse](../../stack/langfuse/)` —
   or just write `[[Langfuse]]` and let the glossary resolve it.
 - **Backlink** (tool → article): Astro has **no native backlinks**, so
-  [`getArticlesForTool()`](packages/core/src/lib/articles.ts) computes the reverse lookup at
+  [`getArticlesForTool()`](packages/stack-site-builder/src/lib/articles.ts) computes the reverse lookup at
   build time — `StackDetail` then shows a "Related writing" list of every
   article whose `tools` includes that slug. Add the slug to an article and the
   backlink appears automatically; nothing to maintain by hand.
@@ -317,7 +317,7 @@ Explain what it is and why it matters for building agents.
 A sentence or two on the sweet spot.
 ```
 
-The schema ([`packages/core/src/content.ts`](packages/core/src/content.ts)) supports more
+The schema ([`packages/stack-site-builder/src/content.ts`](packages/stack-site-builder/src/content.ts)) supports more
 when you need it: `formerNames`, `pricingTiers`/`pricingNote`/`pricingSource`,
 `related` tools, `deprecated`, `docVersion`/`updated`, and the `samples`/
 `projects` fields described above.
