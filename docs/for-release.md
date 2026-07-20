@@ -16,11 +16,12 @@
 
 | 무엇 | 파일 | 비고 |
 | --- | --- | --- |
-| 버전 번호 | [`package.json`](../package.json) | `"version"` 필드를 새 버전으로 |
+| 버전 번호 | [`sites/ai-stack/package.json`](../sites/ai-stack/package.json) | `"version"` 필드를 새 버전으로 |
 | 변경 이력 | [`CHANGELOG.md`](../CHANGELOG.md) | 맨 위에 새 섹션 추가(아래 형식 참고) |
 
-버전 문자열은 이 두 곳에만 있습니다. `astro.config.mjs`나 README에는 버전이
-박혀 있지 않으므로 손댈 필요가 없습니다.
+버전 문자열은 이 두 곳에만 있습니다. 루트 `package.json`은 버전 없는
+워크스페이스 매니페스트이고, `packages/core`와 `sites/ai-image-stack`은 각자의
+버전을 따로 갖습니다 — ai-stack 릴리스에서는 손대지 않습니다.
 
 ## CHANGELOG 작성 형식
 
@@ -40,11 +41,13 @@ git log --oneline vX.Y.Z_이전..HEAD   # 지난 태그 이후의 커밋 목록
 
 ## 마무리 확인
 
-릴리스 커밋 전에 빌드가 깨끗한지 확인합니다.
+릴리스 커밋 전에 빌드가 깨끗한지 확인합니다. 저장소 루트에서 실행하면
+`check`는 모든 사이트를, `build`는 ai-stack을 대상으로 합니다.
 
 ```bash
-pnpm check   # 타입·Astro 진단 (오류 0이어야 함)
-pnpm build   # 전체 사이트 빌드 성공
+pnpm check     # 타입·Astro 진단, 전 사이트 (오류 0이어야 함)
+pnpm build     # ai-stack 정적 빌드 성공
+pnpm -r build  # (선택) ai-image-stack까지 전 사이트 빌드
 ```
 
 ## 릴리스 커밋과 배포
